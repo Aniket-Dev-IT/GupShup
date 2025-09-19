@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     
     # Third-party apps
     'phonenumber_field',
+    'widget_tweaks',
     
     # GupShup custom apps
     'accounts',
@@ -154,6 +155,12 @@ PHONENUMBER_DEFAULT_FORMAT = 'NATIONAL'
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.GupShupUser'
+
+# Custom Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrPhoneBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Keep default as fallback
+]
 
 # Login/Logout URLs
 LOGIN_URL = '/accounts/login/'

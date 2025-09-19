@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card">
+            <div class="card-header text-center" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border: none;">
+                <h3 class="mb-0">
+                    <i class="bi bi-person-plus text-warning"></i>
+                    Join GupShup
+                </h3>
+                <p class="text-muted mb-0">Connect with India 🇮🇳</p>
+                <div class="indian-flag mt-2"></div>
+            </div>
+            
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">
+                            <i class="bi bi-person"></i> Basic Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.first_name|add_class:"form-control" }}
+                                <div class="form-text">{{ form.first_name.help_text }}</div>
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    Last Name
+                                </label>
+                                {{ form.last_name|add_class:"form-control" }}
+                                <div class="form-text">{{ form.last_name.help_text }}</div>
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Details -->
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">
+                            <i class="bi bi-key"></i> Account Details
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                Username <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">@</span>
+                                {{ form.username|add_class:"form-control" }}
+                                <span id="username-feedback" class="input-group-text"></span>
+                            </div>
+                            <div class="form-text">{{ form.username.help_text }}</div>
+                            <div id="username-message" class="small mt-1"></div>
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.email|add_class:"form-control" }}
+                                <span id="email-feedback" class="input-group-text"></span>
+                            </div>
+                            <div class="form-text">{{ form.email.help_text }}</div>
+                            <div id="email-message" class="small mt-1"></div>
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                Phone Number (Optional)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">🇮🇳</span>
+                                {{ form.phone_number|add_class:"form-control" }}
+                                <span id="phone-feedback" class="input-group-text"></span>
+                            </div>
+                            <div class="form-text">{{ form.phone_number.help_text }}</div>
+                            <div id="phone-message" class="small mt-1"></div>
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">
+                            <i class="bi bi-shield-lock"></i> Security
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    Password <span class="text-danger">*</span>
+                                </label>
+                                {{ form.password1|add_class:"form-control" }}
+                                <div class="form-text">{{ form.password1.help_text }}</div>
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    Confirm Password <span class="text-danger">*</span>
+                                </label>
+                                {{ form.password2|add_class:"form-control" }}
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indian Context -->
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">
+                            <i class="bi bi-geo-alt"></i> Indian Details
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">
+                                    City
+                                </label>
+                                {{ form.city|add_class:"form-control" }}
+                                <div class="form-text">{{ form.city.help_text }}</div>
+                                {% if form.city.errors %}
+                                    <div class="text-danger small">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.state.id_for_label }}" class="form-label">
+                                    State/UT
+                                </label>
+                                {{ form.state|add_class:"form-control" }}
+                                {% if form.state.errors %}
+                                    <div class="text-danger small">{{ form.state.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.preferred_language.id_for_label }}" class="form-label">
+                                Preferred Language <span class="text-danger">*</span>
+                            </label>
+                            {{ form.preferred_language|add_class:"form-control" }}
+                            {% if form.preferred_language.errors %}
+                                <div class="text-danger small">{{ form.preferred_language.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Terms and Conditions -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.terms_accepted|add_class:"form-check-input" }}
+                            <label for="{{ form.terms_accepted.id_for_label }}" class="form-check-label">
+                                {{ form.terms_accepted.help_text }} <span class="text-danger">*</span>
+                            </label>
+                            {% if form.terms_accepted.errors %}
+                                <div class="text-danger small">{{ form.terms_accepted.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> Create My GupShup Account
+                        </button>
+                    </div>
+                    
+                    <!-- Login Link -->
+                    <div class="text-center">
+                        <p class="text-muted">
+                            Already have an account? 
+                            <a href="{% url 'accounts:login' %}" class="text-decoration-none">
+                                Login here
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Cultural Note -->
+        <div class="text-center mt-3">
+            <p class="text-muted small">
+                <i class="bi bi-heart-fill text-danger"></i>
+                Built in India for Indians worldwide 
+                <span class="namaste">🙏</span>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Real-time validation functions
+    function checkAvailability(field, url, feedbackElement, messageElement) {
+        const value = field.value.trim();
+        
+        if (!value) {
+            feedbackElement.innerHTML = '';
+            messageElement.innerHTML = '';
+            messageElement.className = 'small mt-1';
+            return;
+        }
+        
+        // Show loading
+        feedbackElement.innerHTML = '<i class="bi bi-arrow-clockwise spin text-muted"></i>';
+        
+        fetch(url + '?q=' + encodeURIComponent(value))
+            .then(response => response.json())
+            .then(data => {
+                if (data.available) {
+                    feedbackElement.innerHTML = '<i class="bi bi-check-circle text-success"></i>';
+                    messageElement.innerHTML = data.message;
+                    messageElement.className = 'small mt-1 text-success';
+                } else {
+                    feedbackElement.innerHTML = '<i class="bi bi-x-circle text-danger"></i>';
+                    messageElement.innerHTML = data.message;
+                    messageElement.className = 'small mt-1 text-danger';
+                }
+            })
+            .catch(error => {
+                feedbackElement.innerHTML = '';
+                console.error('Validation error:', error);
+            });
+    }
+    
+    // Username validation
+    const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+    const usernameFeedback = document.getElementById('username-feedback');
+    const usernameMessage = document.getElementById('username-message');
+    
+    if (usernameField) {
+        let usernameTimeout;
+        usernameField.addEventListener('input', function() {
+            clearTimeout(usernameTimeout);
+            usernameTimeout = setTimeout(() => {
+                checkAvailability(
+                    this, 
+                    '{% url "accounts:check_username" %}?username=', 
+                    usernameFeedback, 
+                    usernameMessage
+                );
+            }, 500);
+        });
+    }
+    
+    // Email validation
+    const emailField = document.getElementById('{{ form.email.id_for_label }}');
+    const emailFeedback = document.getElementById('email-feedback');
+    const emailMessage = document.getElementById('email-message');
+    
+    if (emailField) {
+        let emailTimeout;
+        emailField.addEventListener('input', function() {
+            clearTimeout(emailTimeout);
+            emailTimeout = setTimeout(() => {
+                checkAvailability(
+                    this, 
+                    '{% url "accounts:check_email" %}?email=', 
+                    emailFeedback, 
+                    emailMessage
+                );
+            }, 500);
+        });
+    }
+    
+    // Phone validation
+    const phoneField = document.getElementById('{{ form.phone_number.id_for_label }}');
+    const phoneFeedback = document.getElementById('phone-feedback');
+    const phoneMessage = document.getElementById('phone-message');
+    
+    if (phoneField) {
+        let phoneTimeout;
+        phoneField.addEventListener('input', function() {
+            clearTimeout(phoneTimeout);
+            phoneTimeout = setTimeout(() => {
+                if (this.value.trim()) {
+                    checkAvailability(
+                        this, 
+                        '{% url "accounts:check_phone" %}?phone=', 
+                        phoneFeedback, 
+                        phoneMessage
+                    );
+                } else {
+                    phoneFeedback.innerHTML = '';
+                    phoneMessage.innerHTML = '';
+                }
+            }, 500);
+        });
+    }
+    
+    // Add spinning animation for loading states
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

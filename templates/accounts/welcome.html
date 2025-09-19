@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}GupShup - Connect with India 🇮🇳 | Made in India{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">
+                <span style="background: linear-gradient(135deg, #FF9933 0%, #138808 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    🙏 नमस्ते! Welcome to GupShup
+                </span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                India's own social media platform - connecting Indians worldwide 🇮🇳
+            </p>
+            <div class="indian-flag"></div>
+            <p class="text-muted">Made with ❤️ in India for Indians everywhere</p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="card-body">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🇮🇳</div>
+                        <h5 class="card-title">Indian First</h5>
+                        <p class="card-text">
+                            Built in India, for Indians. Support for Hindi, English, and all Indian languages.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="card-body">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                        <h5 class="card-title">Phone Number Login</h5>
+                        <p class="card-text">
+                            Login with your Indian phone number (+91). Easy and secure access for everyone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="card-body">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🏘️</div>
+                        <h5 class="card-title">Local Connect</h5>
+                        <p class="card-text">
+                            Connect with people from your city, state, and region. Find local communities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Features -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-translate text-warning"></i>
+                            Multi-Language Support
+                        </h5>
+                        <p class="card-text">
+                            Express yourself in Hindi, English, or your native language. 
+                            GupShup understands and celebrates India's linguistic diversity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-shield-check text-success"></i>
+                            Privacy First
+                        </h5>
+                        <p class="card-text">
+                            Your data stays in India. Built with privacy controls and 
+                            security features designed for Indian users.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center">
+            <div class="card p-5" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);">
+                <h3 class="mb-4">Ready to join the GupShup community?</h3>
+                <p class="mb-4 text-muted">
+                    Join thousands of Indians already sharing their stories, 
+                    connecting with friends, and building communities on GupShup.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-person-plus"></i> Join GupShup Now
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Already a member?
+                    </a>
+                </div>
+                
+                <p class="mt-3 small text-muted">
+                    <i class="bi bi-shield-check"></i> Free to join • 
+                    <i class="bi bi-phone"></i> Phone number login • 
+                    <i class="bi bi-translate"></i> Hindi support
+                </p>
+            </div>
+        </div>
+
+        <!-- Indian Cultural Elements -->
+        <div class="row mt-5 text-center">
+            <div class="col-12">
+                <p class="text-muted">
+                    <span style="font-size: 1.2rem;">🙏</span>
+                    "वसुधैव कुटुम्बकम्" - The world is one family
+                    <span style="font-size: 1.2rem;">🙏</span>
+                </p>
+                <div class="d-flex justify-content-center gap-4 mt-3">
+                    <span title="Made in India">🇮🇳</span>
+                    <span title="Namaste">🙏</span>
+                    <span title="Unity in Diversity">🤝</span>
+                    <span title="Digital India">📱</span>
+                    <span title="Incredible India">✨</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-lg {
+        padding: 12px 30px;
+        font-weight: 500;
+        border-radius: 25px;
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        transition: all 0.3s;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add some interactive elements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to feature cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.1)';
+            });
+        });
+    });
+</script>
+{% endblock %}
