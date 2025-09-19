@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - Your Indian Social Feed 🇮🇳{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Feed Column -->
+    <div class="col-lg-8">
+        <!-- Post Creation Card -->
+        <div class="card mb-4">
+            <div class="card-header" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border: none;">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square text-warning"></i>
+                    Share Your Thoughts
+                </h5>
+                <small class="text-muted">Express yourself in Hindi or English! 🇮🇳</small>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="post-form">
+                    {% csrf_token %}
+                    
+                    <!-- Content Area -->
+                    <div class="mb-3">
+                        {{ form.content|add_class:"form-control" }}
+                        <div class="form-text">{{ form.content.help_text }}</div>
+                        {% if form.content.errors %}
+                            <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Additional Options (Collapsible) -->
+                    <div class="collapse" id="postOptions">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.location.id_for_label }}" class="form-label">
+                                    <i class="bi bi-geo-alt"></i> Location
+                                </label>
+                                {{ form.location|add_class:"form-control" }}
+                                <div class="form-text">{{ form.location.help_text }}</div>
+                                
+                                <!-- Indian Cities Datalist -->
+                                <datalist id="indian-cities">
+                                    <option value="Mumbai, Maharashtra">
+                                    <option value="Delhi, Delhi">
+                                    <option value="Bangalore, Karnataka">
+                                    <option value="Chennai, Tamil Nadu">
+                                    <option value="Kolkata, West Bengal">
+                                    <option value="Hyderabad, Telangana">
+                                    <option value="Pune, Maharashtra">
+                                    <option value="Ahmedabad, Gujarat">
+                                    <option value="Jaipur, Rajasthan">
+                                    <option value="Lucknow, Uttar Pradesh">
+                                </datalist>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.privacy.id_for_label }}" class="form-label">
+                                    <i class="bi bi-shield-lock"></i> Privacy
+                                </label>
+                                {{ form.privacy|add_class:"form-control" }}
+                                <div class="form-text">{{ form.privacy.help_text }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">
+                                <i class="bi bi-image"></i> Image
+                            </label>
+                            {{ form.image|add_class:"form-control" }}
+                            <div class="form-text">{{ form.image.help_text }}</div>
+                            {% if form.image.errors %}
+                                <div class="text-danger small">{{ form.image.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Post Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#postOptions">
+                                <i class="bi bi-gear"></i> Options
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="insertHashtag()">
+                                <i class="bi bi-hash"></i> Hashtag
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Share Post
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Posts Feed -->
+        {% for post in page_obj %}
+        <div class="card mb-4 post-card" data-post-id="{{ post.pk }}">
+            <!-- Post Header -->
+            <div class="card-header bg-transparent border-bottom-0">
+                <div class="d-flex align-items-center">
+                    <img src="{% if post.author.avatar %}{{ post.author.avatar.url }}{% else %}/static/img/default-avatar.png{% endif %}" 
+                         class="rounded-circle me-3" 
+                         width="45" height="45" 
+                         alt="@{{ post.author.username }}">
+                    
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">
+                            <a href="#" class="text-decoration-none">
+                                {{ post.author.get_display_name }}
+                            </a>
+                            {% if post.author.is_verified %}
+                                <i class="bi bi-patch-check-fill text-primary" title="Verified"></i>
+                            {% endif %}
+                        </h6>
+                        <small class="text-muted">
+                            @{{ post.author.username }}
+                            {% if post.location %}
+                                • <i class="bi bi-geo-alt"></i> {{ post.location }}
+                            {% endif %}
+                            • {{ post.created_at|timesince }} ago
+                            {% if post.is_edited %}
+                                • <i class="bi bi-pencil" title="Edited"></i>
+                            {% endif %}
+                        </small>
+                    </div>
+                    
+                    <!-- Post Menu -->
+                    {% if post.author == user %}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'posts:edit' post.pk %}">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'posts:delete' post.pk %}">
+                                <i class="bi bi-trash"></i> Delete
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Post Content -->
+            <div class="card-body pt-2">
+                {% if post.content %}
+                <div class="post-content mb-3">
+                    {{ post.content|linebreaks }}
+                </div>
+                {% endif %}
+                
+                <!-- Post Media -->
+                {% if post.media_files.exists %}
+                <div class="post-media mb-3">
+                    <div class="row g-2">
+                        {% for media in post.media_files.all %}
+                        <div class="col-{% if post.media_files.count == 1 %}12{% elif post.media_files.count == 2 %}6{% else %}4{% endif %}">
+                            <img src="{{ media.file.url }}" 
+                                 class="img-fluid rounded" 
+                                 alt="Post image"
+                                 style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
+                                 onclick="openImageModal('{{ media.file.url }}')">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Hashtags -->
+                {% if post.hashtags %}
+                <div class="post-hashtags mb-3">
+                    {% for hashtag in post.get_hashtag_list %}
+                    <a href="{% url 'posts:hashtag_posts' hashtag %}" class="badge bg-light text-primary text-decoration-none me-1">
+                        #{{ hashtag }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Post Footer -->
+            <div class="card-footer bg-transparent">
+                <!-- Engagement Stats -->
+                <div class="row text-center text-muted small mb-2">
+                    <div class="col-3">
+                        <span id="like-count-{{ post.pk }}">{{ post.likes_count }}</span> likes
+                    </div>
+                    <div class="col-3">
+                        {{ post.comments_count }} comments
+                    </div>
+                    <div class="col-3">
+                        {{ post.shares_count }} shares
+                    </div>
+                    <div class="col-3">
+                        {{ post.views_count }} views
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-around border-top pt-2">
+                    <button class="btn btn-sm btn-outline-danger like-btn {% if post.user_has_liked %}active{% endif %}" 
+                            data-post-id="{{ post.pk }}">
+                        <i class="bi bi-heart{% if post.user_has_liked %}-fill{% endif %}"></i>
+                        <span class="like-text">{% if post.user_has_liked %}Liked{% else %}Like{% endif %}</span>
+                    </button>
+                    
+                    <a href="{% url 'posts:detail' post.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-chat"></i> Comment
+                    </a>
+                    
+                    <button class="btn btn-sm btn-outline-success" onclick="sharePost('{{ post.pk }}')">
+                        <i class="bi bi-share"></i> Share
+                    </button>
+                    
+                    <button class="btn btn-sm btn-outline-secondary" onclick="bookmarkPost('{{ post.pk }}')">
+                        <i class="bi bi-bookmark"></i> Save
+                    </button>
+                </div>
+                
+                <!-- Recent Comments Preview -->
+                {% if post.recent_comments %}
+                <div class="mt-3">
+                    <h6 class="text-muted small">Recent comments:</h6>
+                    {% for comment in post.recent_comments %}
+                    <div class="d-flex mb-2">
+                        <img src="{% if comment.author.avatar %}{{ comment.author.avatar.url }}{% else %}/static/img/default-avatar.png{% endif %}" 
+                             class="rounded-circle me-2" 
+                             width="25" height="25">
+                        <div class="flex-grow-1 small">
+                            <strong>{{ comment.author.get_display_name }}</strong>
+                            {{ comment.content|truncatewords:20 }}
+                            <span class="text-muted">• {{ comment.created_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'posts:detail' post.pk %}" class="small text-muted">View all comments...</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <!-- No Posts Message -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-chat-square-text" style="font-size: 4rem; color: var(--indian-saffron);"></i>
+                <h4 class="mt-3">Welcome to GupShup! 🙏</h4>
+                <p class="text-muted">
+                    Your feed is empty. Start following people or create your first post to get started!
+                </p>
+                <div class="mt-4">
+                    <a href="{% url 'posts:explore' %}" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> Explore Posts
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('id_content').focus()">
+                        <i class="bi bi-pencil"></i> Create First Post
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Feed pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Trending Hashtags -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-hash text-primary"></i>
+                    Trending in India 🇮🇳
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for hashtag in trending_hashtags %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="{% url 'posts:hashtag_posts' hashtag.name %}" class="text-decoration-none">
+                        <strong>#{{ hashtag.name }}</strong>
+                    </a>
+                    <span class="badge bg-light text-muted">{{ hashtag.count }}</span>
+                </div>
+                {% empty %}
+                <p class="text-muted">No trending hashtags yet. Start using hashtags in your posts!</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning text-warning"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'posts:create' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Create Post
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-compass"></i> Explore
+                    </a>
+                    <a href="{% url 'posts:search' %}" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-search"></i> Search
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Indian Cultural Element -->
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="indian-flag mb-2"></div>
+                <p class="small text-muted mb-0">
+                    🙏 "सर्वे भवन्तु सुखिनः" - May all be happy<br>
+                    Connect with India on GupShup
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="modalImage" src="" class="img-fluid" alt="Full size image">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Like/Unlike functionality
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const likeText = this.querySelector('.like-text');
+            const heartIcon = this.querySelector('i');
+            const likeCount = document.getElementById(`like-count-${postId}`);
+            
+            // Send AJAX request
+            fetch('{% url "posts:like_post" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    'post_id': postId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    if (data.liked) {
+                        this.classList.add('active');
+                        heartIcon.classList.remove('bi-heart');
+                        heartIcon.classList.add('bi-heart-fill');
+                        likeText.textContent = 'Liked';
+                    } else {
+                        this.classList.remove('active');
+                        heartIcon.classList.remove('bi-heart-fill');
+                        heartIcon.classList.add('bi-heart');
+                        likeText.textContent = 'Like';
+                    }
+                    likeCount.textContent = data.like_count;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+// Helper functions
+function insertHashtag() {
+    const textarea = document.getElementById('id_content');
+    const popularHashtags = ['#Mumbai', '#Delhi', '#India', '#Cricket', '#Bollywood', '#Food', '#Travel'];
+    const randomTag = popularHashtags[Math.floor(Math.random() * popularHashtags.length)];
+    
+    textarea.value += ` ${randomTag} `;
+    textarea.focus();
+}
+
+function openImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+function sharePost(postId) {
+    // Simple share functionality
+    const url = window.location.origin + '/posts/' + postId + '/';
+    if (navigator.share) {
+        navigator.share({
+            title: 'Check out this post on GupShup',
+            text: 'Indian social media platform',
+            url: url
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Post link copied to clipboard! 📋');
+        });
+    }
+}
+
+function bookmarkPost(postId) {
+    // Placeholder for bookmark functionality
+    alert('Bookmark feature coming soon! 🔖');
+}
+</script>
+{% endblock %}

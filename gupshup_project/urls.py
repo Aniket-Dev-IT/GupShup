@@ -21,8 +21,8 @@ urlpatterns = [
     # Main app URLs
     path('', include('accounts.urls')),
     
-    # Future app URLs
-    # path('posts/', include('posts.urls')),
+    # App URLs
+    path('posts/', include('posts.urls')),
     # path('social/', include('social.urls')),
 ]
 

@@ -22,7 +22,7 @@ def home_view(request):
     Home page - redirect to feed if logged in, else show welcome page
     """
     if request.user.is_authenticated:
-        return redirect('posts:feed')  # Will create this later
+        return redirect('posts:feed')
     
     return render(request, 'accounts/welcome.html')
 
