@@ -557,7 +557,7 @@ permission from the copyright holder.
     </a>
   </p>
   
-  <p><em>© 2024 GupShup - The Ultimate Indian Social Experience</em></p>
+  <p><em>© 2024 GupShup - The Ultimate Social Experience</em></p>
 </div>
 
 ## 📝 License
@@ -581,4 +581,4 @@ For support and questions:
 
 ---
 
-**GupShup** - Connecting Indians, one conversation at a time. 🇮🇳
+**GupShup** - Connecting People, one conversation at a time. 🇮🇳
