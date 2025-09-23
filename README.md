@@ -423,7 +423,7 @@ docker-compose up --scale web=3
 
 ## 🏆 **Contributing to GupShup**
 
-### 🙏 **Contributors Welcome**
+### **Contributors Welcome**
 GupShup benefits greatly from community involvement. Bug fixes, new features, documentation improvements - all contributions are valued and appreciated!
 
 ### 📋 **Contribution Process**
@@ -488,7 +488,7 @@ Forking: ✅ Encouraged for learning and contribution
 ### 📋 **Before Using This Project**
 **PLEASE READ CAREFULLY:**
 
-1. **🙏 Seek Permission First**
+1. **Seek Permission First**
    - Contact the developer before any commercial use
    - Respect intellectual property rights
    - Acknowledge the original creator
@@ -516,7 +516,7 @@ permission from the copyright holder.
 
 ---
 
-## 🙏 **Acknowledgments**
+## **Acknowledgments**
 
 ### 📝 **Acknowledgments**
 - **🇮🇳 Indian Developer Community** for valuable feedback and inspiration
@@ -571,7 +571,7 @@ For support and questions:
 - Check the documentation in `/docs/`
 - Review the admin panel user guide
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with Django framework
 - UI components from Bootstrap
