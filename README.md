@@ -11,7 +11,7 @@
   ![Issues](https://img.shields.io/github/issues/Aniket-Dev-IT/GupShup?style=for-the-badge)
   ![Hindi Support](https://img.shields.io/badge/Language-Hindi%20%7C%20English-purple?style=for-the-badge)
   
-  <img src="snap/Homepage.png" alt="GupShup Homepage - Indian Social Media Platform" width="800"/>
+  <img src="Snap/Homepage.png" alt="GupShup Homepage - Indian Social Media Platform" width="800"/>
   
   <p><strong><em>🇮🇳 Where India Connects, Shares, and Grows Together 🇮🇳</em></strong></p>
   
@@ -42,31 +42,31 @@ Key differentiating factors that make GupShup unique:
 ## 📸 **Platform Screenshots**
 
 ### 🏠 **Beautiful Homepage Experience**
-<img src="snap/Homepage.png" alt="GupShup Homepage" width="800"/>
+<img src="Snap/Homepage.png" alt="GupShup Homepage" width="800"/>
 *Modern, clean interface welcoming users with Indian warmth*
 
 ### 📝 **Intuitive Post Creation**
-<img src="snap/User Post Create.png" alt="Post Creation" width="800"/>
+<img src="Snap/User Post Create.png" alt="Post Creation" width="800"/>
 *Express yourself in Hindi or English with rich media support*
 
 ### 🌊 **Engaging Feed Experience**
-<img src="snap/User Posts Feed.png" alt="Posts Feed" width="800"/>
+<img src="Snap/User Posts Feed.png" alt="Posts Feed" width="800"/>
 *Beautiful timeline with video support and modern pagination*
 
 ### 👤 **Rich User Profiles**
-<img src="snap/User Profile.png" alt="User Profile" width="800"/>
+<img src="Snap/User Profile.png" alt="User Profile" width="800"/>
 *Comprehensive profiles showcasing personality and connections*
 
 ### 👥 **Social Connections**
-<img src="snap/User Followers.png" alt="Followers" width="400"/> <img src="snap/User Social Search.png" alt="Social Search" width="400"/>
+<img src="Snap/User Followers.png" alt="Followers" width="400"/> <img src="Snap/User Social Search.png" alt="Social Search" width="400"/>
 *Easy following system and powerful search capabilities*
 
 ### 🔧 **Professional Admin Dashboard**
-<img src="snap/Admin Panel.png" alt="Admin Panel" width="800"/>
+<img src="Snap/Admin Panel.png" alt="Admin Panel" width="800"/>
 *Comprehensive administrative control with modern UI*
 
 ### 📊 **Advanced Analytics**
-<img src="snap/Admin Analytics & Reports.png" alt="Analytics" width="400"/> <img src="snap/Admin User Management Dashboard.png" alt="User Management" width="400"/>
+<img src="Snap/Admin Analytics & Reports.png" alt="Analytics" width="400"/> <img src="Snap/Admin User Management Dashboard.png" alt="User Management" width="400"/>
 *Detailed insights and powerful user management tools*
 
 ---

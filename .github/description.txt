@@ -1,0 +1,1 @@
+GupShup - Professional Indian Social Media Platform | Django-based social network with Hindi/English bilingual support, cultural authentication, real-time messaging, and comprehensive admin panel designed specifically for Indian community worldwide
