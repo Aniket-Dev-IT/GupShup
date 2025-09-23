@@ -1,4 +1,4 @@
-# GupShup 🇮🇳 - The Ultimate Indian Social Media Experience
+# GupShup 🌍 - The Ultimate Global Social Media Experience
 
 <div align="center">
   
@@ -11,9 +11,9 @@
   ![Issues](https://img.shields.io/github/issues/Aniket-Dev-IT/GupShup?style=for-the-badge)
   ![Hindi Support](https://img.shields.io/badge/Language-Hindi%20%7C%20English-purple?style=for-the-badge)
   
-  <img src="Snap/Homepage.png" alt="GupShup Homepage - Indian Social Media Platform" width="800"/>
+  <img src="Snap/Homepage.png" alt="GupShup Homepage - Global Social Media Platform" width="800"/>
   
-  <p><strong><em>🇮🇳 Where India Connects, Shares, and Grows Together 🇮🇳</em></strong></p>
+  <p><strong><em>🌍 Where the World Connects, Shares, and Grows Together 🌍</em></strong></p>
   
   <p>
     <a href="#-quick-start-guide"><strong>Get Started</strong></a> •
@@ -26,16 +26,16 @@
 
 ## 🌟 About GupShup
 
-**GupShup** is a specialized social media platform designed specifically for the Indian community worldwide. After extensive research into Indian social behaviors and cultural preferences, GupShup was developed to create authentic connections while respecting traditional Indian values and embracing modern technology.
+**GupShup** is a modern social media platform designed for users worldwide, with special emphasis on multilingual support and cultural diversity. Built with extensive research into global social behaviors and cultural preferences, GupShup creates authentic connections while respecting diverse cultural values and embracing cutting-edge technology.
 
 ### 🎯 **Why GupShup is Special**
 
 Key differentiating factors that make GupShup unique:
-- **Cultural Awareness**: Features developed based on Indian social patterns and preferences
-- **Language Support**: Built-in Hindi (हिन्दी) and English support with expansion planned
-- **Geographic Integration**: Complete coverage of Indian states, cities, and local areas
+- **Cultural Diversity**: Features developed to respect and celebrate global cultural differences
+- **Multilingual Support**: Built-in Hindi (हिन्दी) and English support with plans for more languages
+- **Global Geographic Integration**: Comprehensive location support for countries and regions worldwide
 - **Relationship Focused**: Tools that prioritize genuine connections over superficial engagement
-- **Family-Oriented Privacy**: Privacy settings designed for Indian family structures
+- **Flexible Privacy**: Privacy settings designed for diverse family structures and cultural preferences
 
 ---
 
@@ -43,11 +43,11 @@ Key differentiating factors that make GupShup unique:
 
 ### 🏠 **Beautiful Homepage Experience**
 <img src="Snap/Homepage.png" alt="GupShup Homepage" width="800"/>
-*Modern, clean interface welcoming users with Indian warmth*
+*Modern, clean interface welcoming users with global appeal and warmth*
 
 ### 📝 **Intuitive Post Creation**
 <img src="Snap/User Post Create.png" alt="Post Creation" width="800"/>
-*Express yourself in Hindi or English with rich media support*
+*Express yourself in multiple languages including Hindi and English with rich media support*
 
 ### 🌊 **Engaging Feed Experience**
 <img src="Snap/User Posts Feed.png" alt="Posts Feed" width="800"/>
@@ -74,7 +74,7 @@ Key differentiating factors that make GupShup unique:
 ## 🚀 **Cutting-Edge Features**
 
 ### 🎭 **Core Social Experience**
-- **🔐 Secure Authentication** - Email & Indian phone number validation (+91)
+- **🔐 Secure Authentication** - Email & international phone number validation
 - **📱 Rich Content Sharing** - Text, images, videos with seamless playback
 - **💝 Social Interactions** - Likes, comments, shares with real-time updates
 - **👤 Personalized Profiles** - Custom avatars, bios, and location display
@@ -83,13 +83,13 @@ Key differentiating factors that make GupShup unique:
 - **🔔 Instant Notifications** - Stay connected with what matters
 - **📱 Mobile-First Design** - Perfect experience across all devices
 
-### 🇮🇳 **Indian-Specific Features**
-- **📍 Location Support** - Complete database of Indian states and cities
-- **📞 Phone Validation** - Proper +91 Indian mobile number formatting and verification
-- **🗣️ Bilingual Interface** - Hindi and English support with proper Unicode handling
-- **🏙️ City Coverage** - Support for major metros to smaller towns across India
-- **🔒 Privacy Settings** - Family-oriented privacy controls suitable for Indian households
-- **⏰ Timezone Setup** - Configured for Indian Standard Time (Asia/Kolkata)
+### 🌍 **Global & Multilingual Features**
+- **📍 Location Support** - Comprehensive database of countries, states, and cities worldwide
+- **📞 Phone Validation** - International phone number formatting and verification
+- **🗣️ Multilingual Interface** - Hindi and English support with proper Unicode handling (more languages planned)
+- **🏙️ Global Coverage** - Support for major cities to smaller towns across all continents
+- **🔒 Flexible Privacy Settings** - Privacy controls adaptable to diverse cultural preferences
+- **⏰ Timezone Support** - Multi-timezone support for global users
 
 ### 🛡️ **Administrative Panel**
 - **📊 Analytics Dashboard** - Real-time statistics and system monitoring
