@@ -1,4 +1,4 @@
-# GupShup  Professional Social Media Platform
+# GupShup -  Professional Social Media Platform
 
 <div align="center">
   
