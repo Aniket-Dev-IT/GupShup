@@ -1,4 +1,4 @@
-# GupShup 🌍 - The Ultimate Global Social Media Experience
+# GupShup  Professional Social Media Platform
 
 <div align="center">
   
