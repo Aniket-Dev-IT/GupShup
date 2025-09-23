@@ -1,0 +1,77 @@
+# GupShup - Git Attributes Configuration
+
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Explicitly define text files
+*.py text
+*.js text
+*.css text
+*.html text
+*.md text
+*.txt text
+*.json text
+*.xml text
+*.yml text
+*.yaml text
+*.ini text
+*.cfg text
+*.env text
+
+# Define binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.avi binary
+*.webm binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+
+# Django specific
+*.po text
+*.pot text
+manage.py text
+
+# Templates
+*.html text
+
+# Configuration files
+requirements.txt text
+.gitignore text
+LICENSE text
+CONTRIBUTING.md text
+
+# Ensure Python files use LF line endings
+*.py text eol=lf
+
+# Ensure shell scripts use LF line endings  
+*.sh text eol=lf
+
+# Windows batch files use CRLF line endings
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Images should be treated as binary
+snap/* binary
+media/* binary
+static/img/* binary
+
+# Archive files
+*.7z binary
+*.gz binary
+*.tar binary
+*.tgz binary
+*.zip binary
+
+# Fonts
+*.ttf binary
+*.eot binary
+*.otf binary
+*.woff binary
+*.woff2 binary

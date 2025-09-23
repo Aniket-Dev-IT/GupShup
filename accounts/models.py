@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 class GupShupUser(AbstractUser):
     """
-    Custom User model for GupShup - Indian Social Media Platform
+    User model for GupShup - Indian Social Media Platform
     
     Extends Django's AbstractUser to include Indian-specific fields
     and social media features
@@ -172,9 +172,15 @@ class GupShupUser(AbstractUser):
     def get_avatar_url(self):
         """Return avatar URL or default"""
         if self.avatar and hasattr(self.avatar, 'url'):
-            return self.avatar.url
-        # Return default avatar based on first letter of name/username
-        return None
+            try:
+                # Try to access the URL - this will raise an exception if file doesn't exist
+                url = self.avatar.url
+                return url
+            except (ValueError, FileNotFoundError):
+                # File doesn't exist or has no file associated
+                return '/static/img/default-avatar.svg'
+        # Return default avatar 
+        return '/static/img/default-avatar.svg'
     
     def save(self, *args, **kwargs):
         """Override save to handle image compression"""

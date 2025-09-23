@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-hero {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), 
+                    url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+        color: white;
+        padding: 120px 0 80px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .legal-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 1;
+    }
+    
+    .legal-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .legal-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+    
+    .legal-section {
+        margin-bottom: 50px;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .legal-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .protection-card {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        height: 100%;
+        background: white;
+        transition: transform 0.3s ease;
+    }
+    
+    .protection-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .protection-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 0 15px 15px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .last-updated {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+        padding: 15px 20px;
+        border-radius: 10px;
+        border-left: 4px solid #ffc107;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        margin: 0 10px 10px 0;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .contact-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-hero">
+    <div class="container">
+        <div class="mb-4">
+            <i class="bi bi-shield-fill" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        </div>
+        <h1 class="display-4 mb-3">Data Protection</h1>
+        <p class="lead">Your data security and privacy are our top priorities</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="legal-content">
+        <div class="last-updated">
+            <i class="bi bi-calendar-check me-2"></i>Last updated: December 2024
+        </div>
+        
+        <div class="highlight-box">
+            <h5><i class="bi bi-shield-check text-primary me-2"></i>Our Commitment to Data Protection</h5>
+            <p class="mb-0">At GupShup, we are committed to protecting your personal data and respecting your privacy rights. We implement comprehensive security measures and follow industry best practices to ensure your information remains safe and secure.</p>
+        </div>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="protection-card">
+                        <div class="protection-icon">
+                            <i class="bi bi-lock-fill"></i>
+                        </div>
+                        <h4>Encryption</h4>
+                        <p>All data transmission is encrypted using industry-standard SSL/TLS protocols. Your personal information is stored using advanced encryption methods.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="protection-card">
+                        <div class="protection-icon">
+                            <i class="bi bi-server"></i>
+                        </div>
+                        <h4>Secure Storage</h4>
+                        <p>Your data is stored on secure servers with multiple layers of protection, including firewalls, intrusion detection, and regular security audits.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="protection-card">
+                        <div class="protection-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h4>Access Control</h4>
+                        <p>Strict access controls ensure that only authorized personnel can access your data, and all access is logged and monitored.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="protection-card">
+                        <div class="protection-icon">
+                            <i class="bi bi-shield-fill-check"></i>
+                        </div>
+                        <h4>Regular Monitoring</h4>
+                        <p>We continuously monitor our systems for security threats and vulnerabilities, with 24/7 security monitoring and incident response.</p>
+                    </div>
+                </div>
+            </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-database-fill me-2"></i>Data Collection and Usage</h3>
+                <p>We collect and process your personal data in accordance with applicable data protection laws, including:</p>
+                <ul>
+                    <li><strong>Account Information:</strong> Name, email, phone number for account creation</li>
+                    <li><strong>Profile Data:</strong> Information you choose to share on your profile</li>
+                    <li><strong>Usage Data:</strong> How you interact with our platform for improvement purposes</li>
+                    <li><strong>Communication Data:</strong> Messages and content you share on the platform</li>
+                    <li><strong>Device Information:</strong> Technical information about your device and browser</li>
+                </ul>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-person-check-fill me-2"></i>Your Data Rights</h3>
+                <p>Under data protection laws, you have several rights regarding your personal data:</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-eye-fill text-primary me-2"></i>Right to Access</h5>
+                        <p>Request a copy of the personal data we hold about you.</p>
+                        
+                        <h5><i class="bi bi-pencil-fill text-primary me-2"></i>Right to Rectification</h5>
+                        <p>Correct any inaccurate or incomplete personal data.</p>
+                        
+                        <h5><i class="bi bi-trash-fill text-primary me-2"></i>Right to Erasure</h5>
+                        <p>Request deletion of your personal data in certain circumstances.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-pause-circle-fill text-primary me-2"></i>Right to Restrict Processing</h5>
+                        <p>Limit how we process your personal data in certain situations.</p>
+                        
+                        <h5><i class="bi bi-download text-primary me-2"></i>Right to Data Portability</h5>
+                        <p>Receive your personal data in a structured, machine-readable format.</p>
+                        
+                        <h5><i class="bi bi-x-circle-fill text-primary me-2"></i>Right to Object</h5>
+                        <p>Object to certain types of data processing.</p>
+                    </div>
+                </div>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-clock-fill me-2"></i>Data Retention</h3>
+                <p>We retain your personal data only as long as necessary for the purposes outlined in our Privacy Policy:</p>
+                <ul>
+                    <li><strong>Account Data:</strong> Retained while your account is active</li>
+                    <li><strong>Communication Data:</strong> Retained according to legal requirements</li>
+                    <li><strong>Usage Analytics:</strong> Anonymized after 2 years</li>
+                    <li><strong>Security Logs:</strong> Retained for 1 year for security purposes</li>
+                </ul>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-globe-americas me-2"></i>International Data Transfers</h3>
+                <p>If we transfer your data outside of your country, we ensure appropriate safeguards are in place:</p>
+                <ul>
+                    <li>Standard Contractual Clauses approved by regulatory authorities</li>
+                    <li>Adequacy decisions by relevant data protection authorities</li>
+                    <li>Other legally recognized transfer mechanisms</li>
+                </ul>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-exclamation-triangle-fill me-2"></i>Security Incidents</h3>
+                <p>In the unlikely event of a data breach:</p>
+                <ul>
+                    <li>We will assess the risk to your rights and freedoms</li>
+                    <li>We will notify relevant authorities within 72 hours if required</li>
+                    <li>We will inform affected users if there is a high risk to their rights</li>
+                    <li>We will take immediate steps to contain and remedy the breach</li>
+                </ul>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-person-badge-fill me-2"></i>Contact Our Data Protection Officer</h3>
+            <p>If you have questions about data protection or want to exercise your rights:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><i class="bi bi-envelope-fill me-2"></i><strong>Email:</strong> dpo@gupshup.com</p>
+                    <p><i class="bi bi-tag-fill me-2"></i><strong>Subject Line:</strong> Data Protection Inquiry</p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="bi bi-clock-fill me-2"></i><strong>Response Time:</strong> Within 30 days</p>
+                    <p><i class="bi bi-translate me-2"></i><strong>Languages:</strong> English, Hindi</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-section">
+            <h4><i class="bi bi-shield-check text-primary me-2"></i>Need Data Protection Help?</h4>
+            <p class="mb-4">If you have questions about data protection or want to exercise your rights, we're here to help!</p>
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="{% url 'pages:privacy_policy' %}" class="btn-primary-gradient" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
+                    <i class="bi bi-shield-check me-2"></i>Privacy Policy
+                </a>
+                <a href="{% url 'pages:cookie_policy' %}" class="btn-primary-gradient" style="background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);">
+                    <i class="bi bi-cookie me-2"></i>Cookie Policy
+                </a>
+                <a href="{% url 'pages:contact' %}" class="btn-primary-gradient">
+                    <i class="bi bi-person-badge me-2"></i>Contact DPO
+                </a>
+            </div>
+            <p class="mt-3 mb-0 text-muted">Email our Data Protection Officer: <a href="mailto:dpo@gupshup.com">dpo@gupshup.com</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-please-change-this-ke
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -49,8 +49,10 @@ INSTALLED_APPS = [
     'accounts',
     'posts',
     'social',
-    # 'messaging',  # Coming next
-    # 'notifications',  # Coming next
+    'messaging',
+    'notifications',
+    'pages',
+    'admin_panel',
 ]
 
 MIDDLEWARE = [
@@ -153,7 +155,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 PHONENUMBER_DEFAULT_REGION = 'IN'
 PHONENUMBER_DEFAULT_FORMAT = 'NATIONAL'
 
-# Custom User Model
+# GupShup User Model
 AUTH_USER_MODEL = 'accounts.GupShupUser'
 
 # Custom Authentication Backends

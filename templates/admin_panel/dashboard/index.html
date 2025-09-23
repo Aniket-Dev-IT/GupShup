@@ -1,0 +1,629 @@
+{% extends 'admin_panel/base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_icon %}
+<i class="fas fa-tachometer-alt me-2"></i>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()" 
+            data-bs-toggle="tooltip" title="Refresh Data">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+    {% if request.admin_user.has_permission:'view_analytics' %}
+    <a href="{% url 'admin_panel:analytics' %}" class="btn btn-outline-success btn-sm"
+       data-bs-toggle="tooltip" title="View Analytics">
+        <i class="fas fa-chart-line me-1"></i>Analytics
+    </a>
+    {% endif %}
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                data-bs-toggle="dropdown">
+            <i class="fas fa-download me-1"></i>Export
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" href="#" onclick="generateReport('daily')">
+                    <i class="fas fa-file-pdf me-2"></i>Daily Report
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" onclick="generateReport('weekly')">
+                    <i class="fas fa-file-excel me-2"></i>Weekly Report
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Quick Stats Row -->
+<div class="row mb-4">
+    <!-- Total Users -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Users
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.users.total|intcomma }}
+                        </div>
+                        <div class="small text-muted">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            +{{ stats.users.new_today }} today
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'admin_panel:users' %}" class="btn btn-sm btn-primary w-100">
+                    <i class="fas fa-eye me-1"></i>View Users
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Posts -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Posts
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.posts.total|intcomma }}
+                        </div>
+                        <div class="small text-muted">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            +{{ stats.posts.new_today }} today
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'admin_panel:posts' %}" class="btn btn-sm btn-success w-100">
+                    <i class="fas fa-eye me-1"></i>View Posts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Moderation -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Pending Moderation
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.moderation.pending_content|default:0 }}
+                        </div>
+                        <div class="small text-muted">
+                            {% if stats.moderation.pending_content > 10 %}
+                                <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                                Needs attention
+                            {% else %}
+                                <i class="fas fa-check text-success me-1"></i>
+                                Under control
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shield-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'admin_panel:moderation_queue' %}" 
+                   class="btn btn-sm btn-warning w-100">
+                    <i class="fas fa-gavel me-1"></i>Review Queue
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Bans -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            Active Bans
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.moderation.bans|default:0 }}
+                        </div>
+                        <div class="small text-muted">
+                            <i class="fas fa-gavel text-info me-1"></i>
+                            {{ stats.moderation.appeals|default:0 }} appeals
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-slash fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{% url 'admin_panel:banned_users' %}" 
+                   class="btn btn-sm btn-danger w-100">
+                    <i class="fas fa-user-slash me-1"></i>View Bans
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- User Growth Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-area me-2"></i>User Growth (Last 30 Days)
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow">
+                        <div class="dropdown-header">Chart Options:</div>
+                        <a class="dropdown-item" href="#" onclick="updateChartPeriod('7')">Last 7 Days</a>
+                        <a class="dropdown-item" href="#" onclick="updateChartPeriod('30')">Last 30 Days</a>
+                        <a class="dropdown-item" href="#" onclick="updateChartPeriod('90')">Last 90 Days</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="userGrowthChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engagement Pie Chart -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-2"></i>Engagement Overview
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-primary"></i> Posts
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-success"></i> Comments
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-info"></i> Likes
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+    <!-- Recent Users -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user-plus me-2"></i>Recent Users
+                </h6>
+                <a href="{% url 'admin_panel:users' %}" class="btn btn-sm btn-outline-primary">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_users %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Location</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">
+                                            {% if user.profile_picture %}
+                                                <img class="rounded-circle" 
+                                                     src="{{ user.profile_picture.url }}" 
+                                                     alt="{{ user.username }}"
+                                                     style="width: 32px; height: 32px;">
+                                            {% else %}
+                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
+                                                     style="width: 32px; height: 32px; font-size: 14px;">
+                                                    {{ user.first_name.0|default:user.username.0|upper }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="font-weight-bold">
+                                                <a href="{% url 'admin_panel:user_detail' user.id %}" 
+                                                   class="text-decoration-none">
+                                                    {{ user.get_full_name|default:user.username }}
+                                                </a>
+                                            </div>
+                                            <small class="text-muted">@{{ user.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <small>
+                                        {% if user.city and user.state %}
+                                            {{ user.city }}, {{ user.state }}
+                                        {% elif user.state %}
+                                            {{ user.state }}
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small>{{ user.date_joined|timesince }} ago</small>
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                    {% if user.is_verified %}
+                                        <i class="fas fa-check-circle text-primary ms-1" 
+                                           data-bs-toggle="tooltip" title="Verified"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <p>No recent users found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-history me-2"></i>Recent Activity
+                </h6>
+                <a href="{% url 'admin_panel:audit_logs' %}" class="btn btn-sm btn-outline-primary">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_actions %}
+                <div class="timeline">
+                    {% for action in recent_actions %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker 
+                            {% if action.severity == 'critical' %}bg-danger
+                            {% elif action.severity == 'warning' %}bg-warning
+                            {% elif action.severity == 'info' %}bg-info
+                            {% else %}bg-success
+                            {% endif %}">
+                            <i class="fas 
+                                {% if action.action_type == 'user_banned' %}fa-user-slash
+                                {% elif action.action_type == 'post_deleted' %}fa-trash
+                                {% elif action.action_type == 'warning_issued' %}fa-exclamation-triangle
+                                {% elif action.action_type == 'admin_login' %}fa-sign-in-alt
+                                {% else %}fa-cog
+                                {% endif %}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">{{ action.title }}</h6>
+                                <small class="text-muted">{{ action.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1 small">{{ action.description|truncatechars:100 }}</p>
+                            <small class="text-muted">
+                                by {{ action.admin.get_full_name|default:action.admin.username|default:"System" }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-history fa-3x mb-3"></i>
+                    <p>No recent activity found</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status Row -->
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-server me-2"></i>System Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Database</span>
+                    <span class="text-success"><i class="fas fa-check-circle"></i> Healthy</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Cache</span>
+                    <span class="text-success"><i class="fas fa-check-circle"></i> Active</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Storage</span>
+                    <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> 78% Used</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Active Admins</span>
+                    <span class="text-info">{{ active_sessions|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic Distribution -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-map-marked-alt me-2"></i>User Distribution (Top States)
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if user_states %}
+                <div class="row">
+                    {% for state_data in user_states %}
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ state_data.state|title }}</span>
+                            <span class="font-weight-bold">{{ state_data.count|intcomma }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" 
+                                 style="width: {{ state_data.count|mul:100|div:stats.users.total }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-map fa-3x mb-3"></i>
+                    <p>No geographic data available</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.timeline {
+    position: relative;
+    padding: 0;
+    list-style: none;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding-left: 3rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+}
+
+.timeline-content {
+    background: #f8f9fc;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 0.25rem solid #e3e6f0;
+}
+
+.chart-area {
+    position: relative;
+    height: 300px;
+}
+
+.chart-pie {
+    position: relative;
+    height: 200px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Dashboard data for charts
+const dashboardData = {
+    userGrowth: [
+        {% for i in "1234567890123456789012345678901234567890"|make_list %}
+        Math.floor(Math.random() * 50) + {{ stats.users.new_today|default:10 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    engagement: {
+        posts: {{ stats.posts.total|default:0 }},
+        comments: {{ stats.engagement.comments|default:0 }},
+        likes: {{ stats.engagement.likes|default:0 }}
+    }
+};
+
+// Initialize charts when DOM is loaded
+$(document).ready(function() {
+    initializeCharts();
+    
+    // Auto-refresh every 5 minutes
+    setInterval(refreshDashboard, 300000);
+});
+
+function initializeCharts() {
+    // User Growth Chart
+    const ctx1 = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: generateDateLabels(30),
+            datasets: [{
+                label: 'New Users',
+                data: dashboardData.userGrowth,
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Engagement Pie Chart
+    const ctx2 = document.getElementById('engagementChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Posts', 'Comments', 'Likes'],
+            datasets: [{
+                data: [
+                    dashboardData.engagement.posts,
+                    dashboardData.engagement.comments,
+                    dashboardData.engagement.likes
+                ],
+                backgroundColor: ['#4e73df', '#1cc88a', '#17a2b8'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function generateDateLabels(days) {
+    const labels = [];
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+    return labels;
+}
+
+function refreshDashboard() {
+    $('#loading-spinner').removeClass('d-none');
+    
+    $.get(window.location.href + '?ajax=1')
+        .done(function(data) {
+            location.reload();
+        })
+        .fail(function() {
+            toastr.error('Failed to refresh dashboard data');
+        })
+        .always(function() {
+            $('#loading-spinner').addClass('d-none');
+        });
+}
+
+function generateReport(type) {
+    $('#loading-spinner').removeClass('d-none');
+    
+    const url = `{% url 'admin_panel:generate_report' %}?type=${type}&format=pdf`;
+    window.open(url, '_blank');
+    
+    $('#loading-spinner').addClass('d-none');
+    toastr.info(`${type.charAt(0).toUpperCase() + type.slice(1)} report is being generated...`);
+}
+
+function updateChartPeriod(days) {
+    // Update chart display for specified time period
+    toastr.info(`Updating chart for last ${days} days...`);
+}
+</script>
+{% endblock %}

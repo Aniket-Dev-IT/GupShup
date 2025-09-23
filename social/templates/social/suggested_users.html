@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load social_tags %}
+
+{% block title %}Suggested People - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .suggestion-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 20px;
+    }
+    
+    .suggestion-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--indian-saffron);
+    }
+    
+    .follow-btn {
+        border-radius: 20px;
+        font-size: 0.9rem;
+        padding: 8px 20px;
+        transition: all 0.3s;
+    }
+    
+    .mutual-friends {
+        background: var(--light-orange);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        color: var(--deep-orange);
+    }
+    
+    .suggestion-reason {
+        background: rgba(255, 153, 51, 0.1);
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        color: var(--indian-saffron);
+        display: inline-block;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">
+                <i class="bi bi-people-fill"></i> Suggested People on GupShup
+                <div class="indian-flag"></div>
+            </h2>
+            <p class="text-muted mb-4">
+                Discover amazing people you might want to connect with based on your interests and mutual connections.
+            </p>
+        </div>
+    </div>
+
+    {% if suggested_users %}
+        <div class="row">
+            {% for suggested_user in suggested_users %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card suggestion-card h-100">
+                        <div class="card-body text-center">
+                            <!-- Profile Picture -->
+                            {% if suggested_user.avatar %}
+                                <img src="{{ suggested_user.avatar.url }}" 
+                                     alt="{{ suggested_user.get_display_name }}" class="user-avatar mb-3">
+                            {% else %}
+                                <div class="user-avatar bg-gradient-primary d-flex align-items-center justify-content-center mb-3 mx-auto">
+                                    <i class="bi bi-person-fill fs-3 text-white"></i>
+                                </div>
+                            {% endif %}
+
+                            <!-- User Info -->
+                            <h5 class="card-title mb-1">
+                                <a href="{% url 'social:profile' suggested_user.username %}" 
+                                   class="text-decoration-none">
+                                    {{ suggested_user.get_display_name }}
+                                </a>
+                            </h5>
+                            <p class="text-muted mb-2">@{{ suggested_user.username }}</p>
+
+                            <!-- Location -->
+                            {% if suggested_user.city %}
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-geo-alt"></i> {{ suggested_user.city }}
+                                </p>
+                            {% endif %}
+
+                            <!-- Bio -->
+                            {% if suggested_user.bio %}
+                                <p class="card-text small mb-3">{{ suggested_user.bio|truncatewords:12 }}</p>
+                            {% endif %}
+
+                            <!-- Mutual Friends -->
+                            {% with mutual_count=suggested_user|get_mutual_friends_count:user %}
+                                {% if mutual_count > 0 %}
+                                    <div class="mutual-friends mb-3">
+                                        <i class="bi bi-people"></i> 
+                                        {{ mutual_count }} mutual friend{{ mutual_count|pluralize }}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+
+                            <!-- Stats -->
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <small class="text-muted">Posts</small>
+                                    <div class="fw-bold">{{ suggested_user.posts.count }}</div>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Followers</small>
+                                    <div class="fw-bold">{{ suggested_user.followers.count }}</div>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Following</small>
+                                    <div class="fw-bold">{{ suggested_user.following.count }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 d-md-block">
+                                {% if suggested_user in user.following.all %}
+                                    <button class="btn btn-outline-primary follow-btn" 
+                                            onclick="toggleFollow('{{ suggested_user.username }}', this)">
+                                        <i class="bi bi-person-check"></i> Following
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-primary follow-btn" 
+                                            onclick="toggleFollow('{{ suggested_user.username }}', this)">
+                                        <i class="bi bi-person-plus"></i> Follow
+                                    </button>
+                                {% endif %}
+                                
+                                <button class="btn btn-outline-secondary follow-btn" 
+                                        onclick="dismissSuggestion('{{ suggested_user.username }}', this)">
+                                    <i class="bi bi-x"></i> Dismiss
+                                </button>
+                            </div>
+
+                            <!-- Suggestion Reason -->
+                            <div class="suggestion-reason">
+                                {% if suggested_user.city and suggested_user.city == user.city %}
+                                    <i class="bi bi-geo-alt"></i> Same location
+                                {% else %}
+                                    <i class="bi bi-people"></i> Popular in your network
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Load More Button -->
+        <div class="row">
+            <div class="col-12 text-center">
+                <button class="btn btn-outline-primary" onclick="loadMoreSuggestions()">
+                    <i class="bi bi-arrow-down-circle"></i> Load More Suggestions
+                </button>
+            </div>
+        </div>
+    {% else %}
+        <!-- No suggestions -->
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="card suggestion-card">
+                    <div class="card-body py-5">
+                        <i class="bi bi-people fs-1 text-muted mb-3"></i>
+                        <h4>No Suggestions Available</h4>
+                        <p class="text-muted mb-4">
+                            We don't have any suggestions for you right now. Try following more people or 
+                            updating your profile to help us find better matches.
+                        </p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="{% url 'social:user_search' %}" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search for People
+                            </a>
+                            <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Update Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Tips Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card suggestion-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lightbulb text-warning"></i> Tips to Find More People
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-pencil-square fs-2 text-primary mb-2"></i>
+                                <h6>Complete Your Profile</h6>
+                                <p class="small text-muted">Add your location, interests, and bio to get better suggestions.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-people-fill fs-2 text-primary mb-2"></i>
+                                <h6>Follow Friends</h6>
+                                <p class="small text-muted">Follow people you know to discover mutual connections.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-heart-fill fs-2 text-primary mb-2"></i>
+                                <h6>Engage with Posts</h6>
+                                <p class="small text-muted">Like and comment on posts to discover like-minded people.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Follow/Unfollow functionality
+async function toggleFollow(username, button) {
+    try {
+        const response = await fetch(`/social/follow/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.action === 'followed') {
+                button.innerHTML = '<i class="bi bi-person-check"></i> Following';
+                button.className = 'btn btn-outline-primary follow-btn';
+            } else {
+                button.innerHTML = '<i class="bi bi-person-plus"></i> Follow';
+                button.className = 'btn btn-primary follow-btn';
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Dismiss suggestion
+function dismissSuggestion(username, button) {
+    if (confirm('Are you sure you want to dismiss this suggestion?')) {
+        const card = button.closest('.col-lg-4, .col-md-6');
+        card.style.transition = 'all 0.3s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            card.remove();
+        }, 300);
+        
+        // You can also make an AJAX call here to record the dismissal
+        console.log('Dismissed suggestion for:', username);
+    }
+}
+
+// Load more suggestions
+function loadMoreSuggestions() {
+    // In a real implementation, this would make an AJAX call to load more suggestions
+    alert('Loading more suggestions... (This would be implemented with pagination)');
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

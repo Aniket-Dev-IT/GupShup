@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.get_display_name }}'s Followers - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .follower-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 20px;
+    }
+    
+    .follower-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--indian-saffron);
+    }
+    
+    .follow-btn {
+        border-radius: 20px;
+        font-size: 0.9rem;
+        padding: 6px 16px;
+    }
+    
+    .mutual-badge {
+        background: var(--light-orange);
+        color: var(--deep-orange);
+        border-radius: 12px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .stats-small {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .followers-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .btn-secondary-gradient {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .follow-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .follow-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .follow-btn.btn-outline-primary {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+    }
+    
+    .follow-btn.btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .view-btn {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        border: none;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .view-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="followers-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-people-fill me-2"></i>People following {{ profile_user.get_display_name }}
+                </h1>
+                <p class="lead mb-0">👥 {{ followers.paginator.count }} Follower{{ followers.paginator.count|pluralize }} • @{{ profile_user.username }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Followers List -->
+    {% if followers %}
+        <div class="row">
+            {% for follower in followers %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card follower-card h-100">
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <!-- Profile Picture -->
+                                {% if follower.avatar %}
+                                    <img src="{{ follower.avatar.url }}" 
+                                         alt="{{ follower.get_display_name }}" class="user-avatar mb-2">
+                                {% else %}
+                                    <div class="user-avatar bg-gradient-primary d-flex align-items-center justify-content-center mb-2 mx-auto">
+                                        <i class="bi bi-person-fill fs-5 text-white"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- User Info -->
+                                <h6 class="card-title mb-1">
+                                    <a href="{% url 'social:profile' follower.username %}" 
+                                       class="text-decoration-none">
+                                        {{ follower.get_display_name }}
+                                    </a>
+                                </h6>
+                                <p class="text-muted mb-2 small">@{{ follower.username }}</p>
+                                
+                                <!-- Location -->
+                                {% if follower.city %}
+                                    <p class="text-muted mb-2 small">
+                                        <i class="bi bi-geo-alt"></i> {{ follower.city }}
+                                    </p>
+                                {% endif %}
+                                
+                                <!-- Mutual Connection Badge -->
+                                {% if follower != user %}
+                                    {% if follower in user.following.all %}
+                                        <span class="mutual-badge">
+                                            <i class="bi bi-arrow-left-right"></i> Mutual
+                                        </span>
+                                    {% elif follower.followers.filter(id=user.id).exists %}
+                                        <span class="mutual-badge">
+                                            <i class="bi bi-people"></i> Follows You
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Bio -->
+                            {% if follower.bio %}
+                                <p class="card-text small text-muted mt-1 mb-2">{{ follower.bio|truncatewords:10 }}</p>
+                            {% endif %}
+                            
+                            <!-- Stats -->
+                            <div class="row text-center mb-2 stats-small">
+                                <div class="col-4">
+                                    <div class="fw-bold">{{ follower.posts.count }}</div>
+                                    <div>Posts</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold">{{ follower.followers.count }}</div>
+                                    <div>Followers</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold">{{ follower.following.count }}</div>
+                                    <div>Following</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="text-center mt-2">
+                                {% if follower == user %}
+                                    <a href="{% url 'social:profile' follower.username %}" class="view-btn me-2">
+                                        <i class="bi bi-person me-1"></i>View
+                                    </a>
+                                    <span class="text-muted small">This is you!</span>
+                                {% else %}
+                                    {% if follower in user.following.all %}
+                                        <button class="follow-btn btn-outline-primary me-2" 
+                                                onclick="toggleFollow('{{ follower.username }}', this)">
+                                            <i class="bi bi-person-check me-1"></i>Following
+                                        </button>
+                                    {% else %}
+                                        <button class="follow-btn me-2" 
+                                                onclick="toggleFollow('{{ follower.username }}', this)">
+                                            <i class="bi bi-person-plus me-1"></i>Follow
+                                        </button>
+                                    {% endif %}
+                                    <a href="{% url 'social:profile' follower.username %}" class="view-btn">
+                                        <i class="bi bi-person me-1"></i>View
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if followers.has_other_pages %}
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="Followers pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if followers.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ followers.previous_page_number }}">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in followers.paginator.page_range %}
+                                {% if followers.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > followers.number|add:'-3' and num < followers.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if followers.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ followers.next_page_number }}">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- No followers -->
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="card follower-card">
+                    <div class="card-body py-5">
+                        <i class="bi bi-people fs-1 text-muted mb-3"></i>
+                        <h4>No Followers Yet</h4>
+                        <p class="text-muted mb-4">
+                            {% if profile_user == user %}
+                                Share interesting content to attract followers to your profile!
+                            {% else %}
+                                {{ profile_user.get_display_name }} doesn't have any followers yet.
+                            {% endif %}
+                        </p>
+                        {% if profile_user == user %}
+                            <div class="d-grid gap-2 d-md-block">
+                                <a href="{% url 'posts:feed' %}" class="btn-primary-gradient">
+                                    <i class="bi bi-plus-circle me-2"></i>Create a Post
+                                </a>
+                                <a href="{% url 'social:suggested_users' %}" class="btn-secondary-gradient">
+                                    <i class="bi bi-people me-2"></i>Find People to Follow
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Follow/Unfollow functionality
+async function toggleFollow(username, button) {
+    try {
+        const response = await fetch(`/social/follow/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.action === 'followed') {
+                button.innerHTML = '<i class="bi bi-person-check"></i> Following';
+                button.className = 'btn btn-outline-primary follow-btn';
+            } else {
+                button.innerHTML = '<i class="bi bi-person-plus"></i> Follow';
+                button.className = 'btn btn-primary follow-btn';
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Start New Conversation - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .start-conversation-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+    
+    .conversation-header {
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .form-section {
+        padding: 30px;
+    }
+    
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 15px 20px;
+        transition: all 0.3s;
+        margin-bottom: 20px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--indian-saffron);
+        box-shadow: 0 0 0 0.2rem rgba(255, 153, 51, 0.25);
+    }
+    
+    .btn-start {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s;
+    }
+    
+    .btn-start:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 153, 51, 0.4);
+        color: white;
+    }
+    
+    .user-suggestions {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .suggestion-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .suggestion-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-avatar-small {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--indian-saffron);
+    }
+    
+    .tips-section {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+    
+    .tip-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .tip-icon {
+        background: var(--indian-saffron);
+        color: white;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card start-conversation-card">
+                <div class="conversation-header">
+                    <i class="bi bi-chat-dots-fill fs-1 mb-3"></i>
+                    <h2 class="mb-2">Start New Conversation</h2>
+                    <p class="mb-0">Connect with someone new on GupShup</p>
+                </div>
+                
+                <!-- Form -->
+                <div class="form-section">
+                    <form method="post" id="conversationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Username Input -->
+                        <div class="mb-4">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i> Who do you want to message?
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                Enter a username (e.g., @johndoe) or search by name
+                            </div>
+                            
+                            <!-- User suggestions (populated by JavaScript) -->
+                            <div id="userSuggestions" class="user-suggestions" style="display: none;">
+                                <h6><i class="bi bi-people"></i> Suggested Users:</h6>
+                                <div id="suggestionsList"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Initial Message -->
+                        <div class="mb-4">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">
+                                <i class="bi bi-chat-quote"></i> First Message (Optional)
+                            </label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small">{{ form.message.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                Start the conversation with a friendly message
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-start me-3">
+                                <i class="bi bi-send"></i> Start Conversation
+                            </button>
+                            <a href="{% url 'messaging:conversations' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Messages
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <h5 class="mb-3">
+                    <i class="bi bi-lightbulb text-warning"></i> Tips for Starting Conversations
+                </h5>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <div>
+                        <strong>Be Friendly:</strong> Start with a warm greeting and introduce yourself if you haven't met before.
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="bi bi-chat"></i>
+                    </div>
+                    <div>
+                        <strong>Find Common Ground:</strong> Mention shared interests, mutual friends, or recent posts you enjoyed.
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="bi bi-emoji-smile"></i>
+                    </div>
+                    <div>
+                        <strong>Be Respectful:</strong> Remember that everyone on GupShup deserves to be treated with kindness and respect.
+                    </div>
+                </div>
+                
+                <div class="tip-item">
+                    <div class="tip-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <strong>Privacy Matters:</strong> Some users have private accounts - you'll need to follow them first to send messages.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-search fs-2 text-primary mb-2"></i>
+                            <h6>Can't find someone?</h6>
+                            <p class="text-muted small">Use our people search to discover new connections</p>
+                            <a href="{% url 'social:user_search' %}" class="btn btn-sm btn-outline-primary">
+                                Search People
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people fs-2 text-success mb-2"></i>
+                            <h6>Need suggestions?</h6>
+                            <p class="text-muted small">Check out people you might know</p>
+                            <a href="{% url 'social:suggested_users' %}" class="btn btn-sm btn-outline-success">
+                                View Suggestions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
+    const suggestionsContainer = document.getElementById('userSuggestions');
+    const suggestionsList = document.getElementById('suggestionsList');
+    let searchTimeout;
+    
+    // Handle form pre-filling
+    {% if username %}
+        usernameInput.value = '{{ username }}';
+        usernameInput.focus();
+        // Move cursor to end
+        setTimeout(() => {
+            usernameInput.setSelectionRange(usernameInput.value.length, usernameInput.value.length);
+        }, 100);
+    {% endif %}
+    
+    // Handle username input for suggestions
+    usernameInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length >= 2) {
+            searchTimeout = setTimeout(() => {
+                searchUsers(query);
+            }, 300);
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+    
+    // Search for users
+    async function searchUsers(query) {
+        try {
+            // This is a simplified implementation - in a real app, you'd have a dedicated search endpoint
+            // For now, we'll show static suggestions
+            showSampleSuggestions();
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+    
+    // Show sample suggestions (placeholder implementation)
+    function showSampleSuggestions() {
+        const sampleUsers = [
+            { username: 'rajesh_kumar', name: 'Rajesh Kumar', location: 'Mumbai' },
+            { username: 'priya_sharma', name: 'Priya Sharma', location: 'Delhi' },
+            { username: 'amit_patel', name: 'Amit Patel', location: 'Bangalore' }
+        ];
+        
+        suggestionsList.innerHTML = '';
+        
+        sampleUsers.forEach(user => {
+            const suggestionCard = document.createElement('div');
+            suggestionCard.className = 'suggestion-card';
+            suggestionCard.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar-small bg-gradient-primary d-flex align-items-center justify-content-center me-3">
+                        <i class="bi bi-person-fill text-white"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${user.name}</h6>
+                        <p class="text-muted small mb-0">@${user.username} • ${user.location}</p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="selectUser('${user.username}')">
+                        Select
+                    </button>
+                </div>
+            `;
+            suggestionsList.appendChild(suggestionCard);
+        });
+        
+        suggestionsContainer.style.display = 'block';
+    }
+    
+    // Select a user from suggestions
+    window.selectUser = function(username) {
+        usernameInput.value = username;
+        suggestionsContainer.style.display = 'none';
+        document.getElementById('{{ form.message.id_for_label }}').focus();
+    };
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('#userSuggestions') && !event.target.closest('#{{ form.username.id_for_label }}')) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+
+// Form validation
+document.getElementById('conversationForm').addEventListener('submit', function(e) {
+    const username = document.getElementById('{{ form.username.id_for_label }}').value.trim();
+    
+    if (!username) {
+        e.preventDefault();
+        alert('Please enter a username to message.');
+        return;
+    }
+    
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Starting...';
+    submitButton.disabled = true;
+    
+    // Re-enable after delay (in case of errors)
+    setTimeout(() => {
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+    }, 5000);
+});
+
+// Auto-resize message textarea
+document.getElementById('{{ form.message.id_for_label }}').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+});
+</script>
+{% endblock %}

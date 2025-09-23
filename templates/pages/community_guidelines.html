@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .guidelines-hero {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), 
+                    url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+        color: white;
+        padding: 120px 0 80px;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+    
+    .guidelines-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 1;
+    }
+    
+    .guidelines-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .guideline-card {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        height: 100%;
+        background: white;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .guideline-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .guideline-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        margin: 0 auto 1.5rem auto;
+    }
+    
+    .section-divider {
+        border-top: 3px solid #667eea;
+        margin: 4rem 0;
+        opacity: 0.3;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .btn-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+    
+    .btn-gradient-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .prohibited-section {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border-left: 5px solid #e53e3e;
+    }
+    
+    .enforcement-section {
+        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border-left: 5px solid #38a169;
+    }
+    
+    .prohibited-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        transition: background 0.2s ease;
+    }
+    
+    .prohibited-item:hover {
+        background: rgba(255, 255, 255, 0.9);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="guidelines-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-3">Community Guidelines</h1>
+                <p class="lead mb-0">Building a safe, respectful, and inclusive community for everyone.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="mb-5">
+                <h2 class="mb-3">Our Community Values</h2>
+                <p class="lead">GupShup is built on the foundation of respect, authenticity, and meaningful connections. These guidelines help us maintain a positive environment where everyone can share, learn, and connect safely.</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="guideline-card">
+                        <div class="guideline-icon">
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+                        <h4>Be Respectful</h4>
+                        <p>Treat all community members with dignity and respect. Harassment, hate speech, or discriminatory behavior based on race, gender, religion, or any other characteristic is not tolerated.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="guideline-card">
+                        <div class="guideline-icon">
+                            <i class="bi bi-shield-fill"></i>
+                        </div>
+                        <h4>Stay Safe</h4>
+                        <p>Protect your personal information and respect others' privacy. Don't share personal details like addresses, phone numbers, or financial information publicly.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="guideline-card">
+                        <div class="guideline-icon">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <h4>Be Authentic</h4>
+                        <p>Use your real identity and share genuine content. Fake accounts, impersonation, or misleading information undermines trust in our community.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-4">
+                    <div class="guideline-card">
+                        <div class="guideline-icon">
+                            <i class="bi bi-chat-heart-fill"></i>
+                        </div>
+                        <h4>Engage Positively</h4>
+                        <p>Contribute meaningful content and engage in constructive conversations. Spam, excessive self-promotion, or irrelevant content disrupts the community experience.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="prohibited-section">
+                        <h3 class="mb-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Prohibited Content</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Violence or threats</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Hate speech or discrimination</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Harassment or bullying</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Adult or explicit content</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Illegal activities</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Spam or excessive self-promotion</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>False or misleading information</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Copyright infringement</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Impersonation or fake accounts</span>
+                                </div>
+                                <div class="prohibited-item">
+                                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                    <span>Malicious links or malware</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="enforcement-section">
+                        <h3 class="mb-4 text-success"><i class="bi bi-shield-check-fill me-2"></i>Reporting and Enforcement</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-success"><i class="bi bi-flag-fill me-2"></i>How to Report</h5>
+                                <p>If you encounter content that violates these guidelines, please report it immediately using the report button or contact our support team.</p>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-warning"><i class="bi bi-exclamation-triangle-fill me-2"></i>Enforcement Actions</h5>
+                                <p>Violations may result in:</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-dot"></i> Content removal</li>
+                                    <li><i class="bi bi-dot"></i> Warning messages</li>
+                                    <li><i class="bi bi-dot"></i> Temporary restrictions</li>
+                                    <li><i class="bi bi-dot"></i> Account suspension</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-info"><i class="bi bi-arrow-clockwise me-2"></i>Appeals Process</h5>
+                                <p>If you believe an action was taken in error, you can appeal by contacting our support team within 30 days.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <p class="text-muted">These guidelines are subject to change. We'll notify the community of any major updates.</p>
+                <p><strong>Last updated:</strong> December 2024</p>
+                <div class="mt-4">
+                    <a href="{% url 'pages:contact' %}" class="btn-primary-gradient me-3">
+                        <i class="bi bi-envelope me-2"></i>Contact Support
+                    </a>
+                    <a href="{% url 'pages:help_center' %}" class="btn-gradient-success">
+                        <i class="bi bi-question-circle me-2"></i>Help Center
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

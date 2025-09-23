@@ -1,0 +1,1105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ other_user.get_display_name }} - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: calc(100vh - 200px);
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .chat-user-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .chat-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        margin-right: 15px;
+    }
+    
+    .chat-user-details h5 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    .chat-user-details p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+    
+    .chat-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .message-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+    
+    .message-group.own {
+        align-items: flex-end;
+    }
+    
+    .message-group.other {
+        align-items: flex-start;
+    }
+    
+    .message-bubble {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        margin-bottom: 2px;
+        word-wrap: break-word;
+        position: relative;
+        animation: messageSlideIn 0.3s ease-out;
+    }
+    
+    .message-bubble.own {
+        background: var(--primary-gradient);
+        color: white;
+        border-bottom-right-radius: 6px;
+    }
+    
+    .message-bubble.other {
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .message-image {
+        max-width: 100%;
+        border-radius: 12px;
+        margin-top: 5px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .message-image:hover {
+        transform: scale(1.02);
+    }
+    
+    .message-file {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 5px;
+    }
+    
+    .message-status {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-left: 5px;
+    }
+    
+    .chat-input-area {
+        background: white;
+        padding: 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .message-input-container {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        background: #f8f9fa;
+        border-radius: 25px;
+        padding: 10px;
+    }
+    
+    .message-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        resize: none;
+        outline: none;
+        font-size: 1rem;
+        max-height: 120px;
+        line-height: 1.4;
+    }
+    
+    .input-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .attachment-btn, .send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .attachment-btn {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .attachment-btn:hover {
+        background: #5a6268;
+        transform: scale(1.1);
+    }
+    
+    .send-btn {
+        background: var(--primary-gradient);
+        color: white;
+    }
+    
+    .send-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(255, 153, 51, 0.4);
+    }
+    
+    .send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .typing-indicator {
+        display: none;
+        color: #6c757d;
+        font-style: italic;
+        padding: 0 20px;
+        animation: pulse 1.5s infinite;
+    }
+    
+    .blocked-notice {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+        padding: 20px;
+        text-align: center;
+        border-radius: 15px;
+        margin: 20px;
+    }
+    
+    .privacy-notice {
+        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        color: #0c5460;
+        padding: 20px;
+        text-align: center;
+        border-radius: 15px;
+        margin: 20px;
+    }
+    
+    .attachment-preview {
+        display: none;
+        background: rgba(255, 153, 51, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    
+    @keyframes messageSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 120px);
+        }
+        
+        .message-bubble {
+            max-width: 85%;
+        }
+        
+        .chat-header {
+            padding: 15px;
+        }
+        
+        .chat-messages {
+            padding: 15px;
+        }
+        
+        .chat-input-area {
+            padding: 15px;
+        }
+    }
+    
+    /* Scrollbar styling */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(255, 153, 51, 0.3);
+        border-radius: 3px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 153, 51, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        {% if other_user.avatar %}
+                            <img src="{{ other_user.avatar.url }}" 
+                                 alt="{{ other_user.get_display_name }}" class="chat-avatar">
+                        {% else %}
+                            <div class="chat-avatar bg-white d-flex align-items-center justify-content-center">
+                                <i class="bi bi-person-fill fs-5 text-primary"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="chat-user-details">
+                            <h5>{{ other_user.get_display_name }}</h5>
+                            <p>@{{ other_user.username }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-actions">
+                        <a href="{% url 'social:profile' other_user.username %}" 
+                           class="btn btn-light btn-sm" title="View Profile">
+                            <i class="bi bi-person"></i>
+                        </a>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% if not is_blocked %}
+                                    <li>
+                                        <button class="dropdown-item" onclick="clearHistory()">
+                                            <i class="bi bi-trash"></i> Clear History
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-danger" onclick="blockUser()">
+                                            <i class="bi bi-slash-circle"></i> Block User
+                                        </button>
+                                    </li>
+                                {% else %}
+                                    {% if blocked_by_me %}
+                                        <li>
+                                            <button class="dropdown-item text-success" onclick="unblockUser()">
+                                                <i class="bi bi-check-circle"></i> Unblock User
+                                            </button>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'messaging:conversations' %}">
+                                        <i class="bi bi-arrow-left"></i> Back to Messages
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Check if messaging is allowed -->
+                {% if not can_message %}
+                    <div class="privacy-notice">
+                        <i class="bi bi-lock fs-3 mb-3"></i>
+                        <h5>Cannot Send Messages</h5>
+                        <p>You can only message users you follow if they have a private account.</p>
+                        <a href="{% url 'social:profile' other_user.username %}" class="btn btn-primary">
+                            Visit Profile
+                        </a>
+                    </div>
+                {% elif is_blocked %}
+                    <div class="blocked-notice">
+                        <i class="bi bi-slash-circle fs-3 mb-3"></i>
+                        <h5>
+                            {% if blocked_by_me %}
+                                You have blocked this user
+                            {% else %}
+                                This conversation has been blocked
+                            {% endif %}
+                        </h5>
+                        <p>
+                            {% if blocked_by_me %}
+                                Unblock to resume messaging.
+                            {% else %}
+                                You cannot send messages in this conversation.
+                            {% endif %}
+                        </p>
+                    </div>
+                {% else %}
+                    <!-- Messages Area -->
+                    <div class="chat-messages" id="messagesContainer">
+                        {% for message in messages %}
+                            <div class="message-group {% if message.sender == user %}own{% else %}other{% endif %}">
+                                <div class="message-bubble {% if message.sender == user %}own{% else %}other{% endif %}" 
+                                     data-message-id="{{ message.id }}">
+                                    
+                                    {% if message.message_type == 'text' %}
+                                        {{ message.content|linebreaks }}
+                                    
+                                    {% elif message.message_type == 'image' %}
+                                        {{ message.content|linebreaks }}
+                                        <img src="{{ message.image.url }}" 
+                                             alt="Shared image" 
+                                             class="message-image"
+                                             onclick="openImageModal('{{ message.image.url }}')">
+                                    
+                                    {% elif message.message_type == 'file' %}
+                                        {{ message.content|linebreaks }}
+                                        <div class="message-file">
+                                            <i class="bi bi-file-earmark fs-4"></i>
+                                            <div>
+                                                <div class="fw-bold">{{ message.get_file_name }}</div>
+                                                <a href="{{ message.file.url }}" 
+                                                   download 
+                                                   class="text-decoration-none small">
+                                                    Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="message-time">
+                                        {{ message.sent_at|date:"H:i" }}
+                                        {% if message.sender == user %}
+                                            <span class="message-status">
+                                                {% if message.is_read %}
+                                                    <i class="bi bi-check2-all text-light"></i>
+                                                {% else %}
+                                                    <i class="bi bi-check2 text-light"></i>
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-chat-dots fs-1 mb-3"></i>
+                                <h5>No messages yet</h5>
+                                <p>Start the conversation by sending a message!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span id="typingText">{{ other_user.get_display_name }} is typing...</span>
+                    </div>
+                    
+                    <!-- Message Input Area -->
+                    <div class="chat-input-area">
+                        <!-- Attachment Preview -->
+                        <div class="attachment-preview" id="attachmentPreview">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-paperclip me-2"></i>
+                                    <span id="attachmentName"></span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearAttachment()">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <form method="post" enctype="multipart/form-data" id="messageForm">
+                            {% csrf_token %}
+                            
+                            <!-- Hidden file inputs -->
+                            <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+                            <input type="file" id="fileInput" name="file" accept=".pdf,.doc,.docx,.txt,.zip,.rar" style="display: none;">
+                            
+                            <div class="message-input-container">
+                                <textarea 
+                                    class="message-input" 
+                                    name="content"
+                                    id="messageInput"
+                                    placeholder="Type a message..."
+                                    rows="1"
+                                    onkeypress="handleKeyPress(event)"
+                                    oninput="handleInput(this)"
+                                ></textarea>
+                                
+                                <div class="input-actions">
+                                    <div class="dropdown">
+                                        <button type="button" class="attachment-btn" data-bs-toggle="dropdown">
+                                            <i class="bi bi-paperclip"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button type="button" class="dropdown-item" onclick="document.getElementById('imageInput').click()">
+                                                    <i class="bi bi-image text-primary"></i> Photo
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item" onclick="document.getElementById('fileInput').click()">
+                                                    <i class="bi bi-file-earmark text-secondary"></i> File
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <button type="submit" class="send-btn" id="sendButton">
+                                        <i class="bi bi-send-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shared Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+const conversationId = '{{ conversation.id }}';
+const currentUser = '{{ user.username }}';
+let lastMessageTime = new Date().toISOString();
+let isPolling = false;
+let typingTimeout;
+
+// Initialize chat
+document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom();
+    startMessagePolling();
+    setupFileInputs();
+    
+    // Auto-resize message input
+    const messageInput = document.getElementById('messageInput');
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+});
+
+// Handle form submission
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const content = formData.get('content').trim();
+    const hasImage = document.getElementById('imageInput').files.length > 0;
+    const hasFile = document.getElementById('fileInput').files.length > 0;
+    
+    // Validate input
+    if (!content && !hasImage && !hasFile) {
+        return;
+    }
+    
+    // Disable send button
+    const sendButton = document.getElementById('sendButton');
+    sendButton.disabled = true;
+    sendButton.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+    
+    // Send via regular form submission for files, AJAX for text only
+    if (hasImage || hasFile) {
+        // Let the form submit normally for file uploads
+        this.submit();
+    } else {
+        // Send via AJAX for text messages
+        sendQuickMessage(content);
+    }
+});
+
+// Send quick message via AJAX
+async function sendQuickMessage(content) {
+    try {
+        const response = await fetch(`/messages/api/send/${conversationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: content })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Clear input
+            document.getElementById('messageInput').value = '';
+            document.getElementById('messageInput').style.height = 'auto';
+            
+            // Add message to UI
+            addMessageToUI(data.message, true);
+            scrollToBottom();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to send message. Please try again.');
+    } finally {
+        // Re-enable send button
+        const sendButton = document.getElementById('sendButton');
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="bi bi-send-fill"></i>';
+    }
+}
+
+// Add message to UI
+function addMessageToUI(messageData, isOwn) {
+    const messagesContainer = document.getElementById('messagesContainer');
+    
+    const messageGroup = document.createElement('div');
+    messageGroup.className = `message-group ${isOwn ? 'own' : 'other'}`;
+    
+    const messageBubble = document.createElement('div');
+    messageBubble.className = `message-bubble ${isOwn ? 'own' : 'other'}`;
+    messageBubble.setAttribute('data-message-id', messageData.id);
+    
+    let messageContent = `<div>${messageData.content.replace(/\n/g, '<br>')}</div>`;
+    
+    if (messageData.image_url) {
+        messageContent += `<img src="${messageData.image_url}" alt="Shared image" class="message-image" onclick="openImageModal('${messageData.image_url}')">`;
+    }
+    
+    messageContent += `
+        <div class="message-time">
+            ${messageData.sent_at}
+            ${isOwn ? '<span class="message-status"><i class="bi bi-check2 text-light"></i></span>' : ''}
+        </div>
+    `;
+    
+    messageBubble.innerHTML = messageContent;
+    messageGroup.appendChild(messageBubble);
+    messagesContainer.appendChild(messageGroup);
+    
+    // Update last message time
+    lastMessageTime = new Date().toISOString();
+}
+
+// Poll for new messages
+async function pollNewMessages() {
+    if (isPolling) return;
+    
+    isPolling = true;
+    
+    try {
+        const response = await fetch(`/messages/api/poll/${conversationId}/?since=${lastMessageTime}`);
+        const data = await response.json();
+        
+        if (data.success && data.has_new_messages) {
+            data.messages.forEach(message => {
+                addMessageToUI(message, false);
+            });
+            scrollToBottom();
+        }
+    } catch (error) {
+        console.error('Polling error:', error);
+    } finally {
+        isPolling = false;
+    }
+}
+
+// Start message polling
+function startMessagePolling() {
+    // Poll every 3 seconds
+    setInterval(pollNewMessages, 3000);
+}
+
+// Handle key press in message input
+function handleKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+    }
+    
+    // Show typing indicator
+    showTypingIndicator();
+}
+
+// Handle input changes
+function handleInput(textarea) {
+    // Auto-resize
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight) + 'px';
+    
+    // Show typing indicator
+    showTypingIndicator();
+}
+
+// Show typing indicator
+function showTypingIndicator() {
+    // Send typing status to server
+    fetch(`/messages/api/conversation/${conversationId}/typing/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        }
+    }).catch(error => console.error('Typing indicator error:', error));
+    
+    // Clear previous timeout
+    if (typingTimeout) {
+        clearTimeout(typingTimeout);
+    }
+    
+    // Check for other user typing after a short delay
+    typingTimeout = setTimeout(checkTypingStatus, 500);
+}
+
+// Check if other user is typing
+async function checkTypingStatus() {
+    try {
+        const response = await fetch(`/messages/api/conversation/${conversationId}/typing/`);
+        const data = await response.json();
+        
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (data.success && data.is_typing) {
+            if (typingIndicator) {
+                typingIndicator.textContent = `${data.typing_user} is typing...`;
+                typingIndicator.style.display = 'block';
+            }
+        } else {
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error checking typing status:', error);
+    }
+}
+
+// Message search functionality
+function searchMessages() {
+    const query = document.getElementById('searchInput')?.value.trim();
+    if (!query) return;
+    
+    fetch(`/messages/api/search/?q=${encodeURIComponent(query)}&conversation_id=${conversationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displaySearchResults(data.results);
+            } else {
+                alert('Search failed: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            alert('Search failed. Please try again.');
+        });
+}
+
+// Display search results
+function displaySearchResults(results) {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer) return;
+    
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-muted">No messages found.</p>';
+        return;
+    }
+    
+    let html = '<div class="search-results-list">';
+    results.forEach(result => {
+        html += `
+            <div class="search-result-item p-2 border-bottom" onclick="highlightMessage('${result.id}')">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>You:</strong> ${result.content}
+                    </div>
+                    <small class="text-muted">${result.sent_at}</small>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    resultsContainer.innerHTML = html;
+}
+
+// Toggle search panel
+function toggleSearch() {
+    const searchPanel = document.getElementById('searchPanel');
+    if (searchPanel) {
+        searchPanel.style.display = searchPanel.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Clear search
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    
+    if (searchInput) searchInput.value = '';
+    if (searchResults) searchResults.innerHTML = '';
+}
+
+// Toggle settings panel
+function toggleSettings() {
+    const settingsPanel = document.getElementById('settingsPanel');
+    if (settingsPanel) {
+        settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Update conversation settings
+function updateSetting(setting, value) {
+    fetch(`/messages/api/conversation/${conversationId}/settings/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ setting: setting, value: value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Settings error:', error);
+        alert('Failed to update setting.');
+    });
+}
+
+// Delete message
+function deleteMessage(messageId) {
+    if (!confirm('Delete this message?')) return;
+    
+    fetch(`/messages/api/message/${messageId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove message from UI
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
+            showToast('Message deleted', 'success');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        alert('Failed to delete message.');
+    });
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+    // Simple toast implementation - in production, use a proper toast library
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close ms-2" onclick="this.parentNode.remove()"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 3000);
+}
+
+// Enhanced message actions
+function setupMessageActions() {
+    // Add right-click context menu for messages
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('.message-bubble.own')) {
+            e.preventDefault();
+            showMessageContextMenu(e, e.target.closest('.message-bubble'));
+        }
+    });
+}
+
+// Show message context menu
+function showMessageContextMenu(event, messageElement) {
+    const messageId = messageElement.getAttribute('data-message-id');
+    
+    // Create context menu
+    const menu = document.createElement('div');
+    menu.className = 'context-menu';
+    menu.style.cssText = `
+        position: fixed;
+        top: ${event.clientY}px;
+        left: ${event.clientX}px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+    `;
+    
+    menu.innerHTML = `
+        <div class="p-2">
+            <button class="btn btn-sm btn-outline-danger w-100" onclick="deleteMessage('${messageId}'); this.closest('.context-menu').remove();">
+                <i class="bi bi-trash"></i> Delete Message
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(menu);
+    
+    // Remove menu when clicking elsewhere
+    document.addEventListener('click', function removeMenu() {
+        if (menu.parentNode) {
+            menu.parentNode.removeChild(menu);
+        }
+        document.removeEventListener('click', removeMenu);
+    });
+}
+
+// Initialize advanced features
+document.addEventListener('DOMContentLoaded', function() {
+    setupMessageActions();
+    
+    // Setup settings checkboxes
+    const muteCheckbox = document.getElementById('muteNotifications');
+    const archiveCheckbox = document.getElementById('archiveConversation');
+    
+    if (muteCheckbox) {
+        muteCheckbox.addEventListener('change', function() {
+            updateSetting('muted', this.checked);
+        });
+    }
+    
+    if (archiveCheckbox) {
+        archiveCheckbox.addEventListener('change', function() {
+            updateSetting('archived', this.checked);
+        });
+    }
+});
+
+// Scroll to bottom of messages
+function scrollToBottom() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Setup file inputs
+function setupFileInputs() {
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        handleFileSelection(e, 'image');
+    });
+    
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        handleFileSelection(e, 'file');
+    });
+}
+
+// Handle file selection
+function handleFileSelection(event, type) {
+    const file = event.target.files[0];
+    if (file) {
+        const preview = document.getElementById('attachmentPreview');
+        const nameElement = document.getElementById('attachmentName');
+        
+        nameElement.textContent = file.name;
+        preview.style.display = 'block';
+        
+        // Clear the other input
+        if (type === 'image') {
+            document.getElementById('fileInput').value = '';
+        } else {
+            document.getElementById('imageInput').value = '';
+        }
+    }
+}
+
+// Clear attachment
+function clearAttachment() {
+    document.getElementById('imageInput').value = '';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('attachmentPreview').style.display = 'none';
+}
+
+// Open image modal
+function openImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Conversation actions
+async function blockUser() {
+    if (confirm('Are you sure you want to block this user?')) {
+        try {
+            const response = await fetch(`/messages/api/conversation/${conversationId}/action/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'block' })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        }
+    }
+}
+
+async function unblockUser() {
+    try {
+        const response = await fetch(`/messages/api/conversation/${conversationId}/action/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'unblock' })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred.');
+    }
+}
+
+async function clearHistory() {
+    if (confirm('Are you sure you want to clear chat history? This cannot be undone.')) {
+        try {
+            const response = await fetch(`/messages/api/conversation/${conversationId}/action/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'clear' })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        }
+    }
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

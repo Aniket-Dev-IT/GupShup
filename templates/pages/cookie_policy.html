@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .legal-hero {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), 
+                    url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+        color: white;
+        padding: 120px 0 80px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .legal-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 1;
+    }
+    
+    .legal-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .legal-content {
+        max-width: 900px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+    
+    .legal-section {
+        margin-bottom: 50px;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .legal-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .cookie-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin: 25px 0;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        border-left: 5px solid #667eea;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 0 15px 15px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .last-updated {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+        padding: 15px 20px;
+        border-radius: 10px;
+        border-left: 4px solid #ffc107;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        margin: 0 10px 10px 0;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .contact-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-hero">
+    <div class="container">
+        <div class="mb-4">
+            <i class="bi bi-cookie" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        </div>
+        <h1 class="display-4 mb-3">Cookie Policy</h1>
+        <p class="lead">Learn how we use cookies to improve your experience on GupShup</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="legal-content">
+        <div class="last-updated">
+            <i class="bi bi-calendar-check me-2"></i>Last updated: December 2024
+        </div>
+        
+        <div class="highlight-box">
+            <h5><i class="bi bi-info-circle-fill text-primary me-2"></i>What are Cookies?</h5>
+            <p class="mb-0">Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and analyzing how you use our platform.</p>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-gear-fill me-2"></i>How We Use Cookies</h3>
+            <p>We use cookies for various purposes:</p>
+                <ul>
+                    <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+                    <li><strong>Performance Cookies:</strong> Help us analyze website usage and performance</li>
+                    <li><strong>Functionality Cookies:</strong> Remember your preferences and settings</li>
+                    <li><strong>Targeting Cookies:</strong> Provide personalized content and advertisements</li>
+                </ul>
+            </div>
+            
+        <div class="legal-section">
+            <h3><i class="bi bi-list-ul me-2"></i>Types of Cookies We Use</h3>
+                <div class="cookie-table">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Cookie Type</th>
+                                <th>Purpose</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Session Cookies</strong></td>
+                                <td>Keep you logged in during your visit</td>
+                                <td>Until browser is closed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Authentication Cookies</strong></td>
+                                <td>Remember your login status</td>
+                                <td>30 days</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Preference Cookies</strong></td>
+                                <td>Store your settings and preferences</td>
+                                <td>1 year</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Analytics Cookies</strong></td>
+                                <td>Help us understand how you use our site</td>
+                                <td>2 years</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Security Cookies</strong></td>
+                                <td>Protect against fraud and security threats</td>
+                                <td>Session/30 days</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-globe me-2"></i>Third-Party Cookies</h3>
+                <p>We may also use third-party cookies from trusted partners:</p>
+                <ul>
+                    <li><strong>Google Analytics:</strong> Website analytics and performance monitoring</li>
+                    <li><strong>Social Media Platforms:</strong> Social sharing and login functionality</li>
+                    <li><strong>Content Delivery Networks:</strong> Faster loading of website resources</li>
+                </ul>
+                <p>These third parties have their own privacy policies governing their use of cookies.</p>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-sliders me-2"></i>Managing Your Cookies</h3>
+                <p>You have control over cookies on your device:</p>
+                
+                <h4>Browser Settings</h4>
+                <p>Most web browsers allow you to:</p>
+                <ul>
+                    <li>View cookies stored on your device</li>
+                    <li>Delete existing cookies</li>
+                    <li>Block some or all cookies</li>
+                    <li>Set preferences for specific websites</li>
+                </ul>
+                
+                <h4>Cookie Preferences</h4>
+                <p>You can manage your cookie preferences through our Cookie Consent banner or by updating your account settings.</p>
+                
+                <div class="highlight-box">
+                    <p class="mb-0"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i><strong>Note:</strong> Disabling certain cookies may affect the functionality of our website and your user experience.</p>
+                </div>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-check-circle-fill me-2"></i>Cookie Consent</h3>
+                <p>When you first visit our website, we'll ask for your consent to use cookies. You can:</p>
+                <ul>
+                    <li>Accept all cookies</li>
+                    <li>Accept only essential cookies</li>
+                    <li>Customize your preferences</li>
+                    <li>Withdraw consent at any time</li>
+                </ul>
+        </div>
+        
+        <div class="legal-section">
+            <h3><i class="bi bi-arrow-clockwise me-2"></i>Updates to This Policy</h3>
+            <p>We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We encourage you to review this policy periodically.</p>
+        </div>
+        
+        <div class="contact-section">
+            <h4><i class="bi bi-question-circle-fill text-primary me-2"></i>Questions About Cookies?</h4>
+            <p class="mb-4">If you have questions about our Cookie Policy, we're here to help!</p>
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="{% url 'pages:privacy_policy' %}" class="btn-primary-gradient" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
+                    <i class="bi bi-shield-check me-2"></i>Privacy Policy
+                </a>
+                <a href="{% url 'pages:terms_of_service' %}" class="btn-primary-gradient" style="background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);">
+                    <i class="bi bi-file-text me-2"></i>Terms of Service
+                </a>
+                <a href="{% url 'pages:contact' %}" class="btn-primary-gradient">
+                    <i class="bi bi-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+            <p class="mt-3 mb-0 text-muted">Email us directly: <a href="mailto:support@gupshup.com">support@gupshup.com</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

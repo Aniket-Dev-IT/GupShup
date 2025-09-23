@@ -55,7 +55,7 @@ def register_view(request):
                 if not user.bio and not user.avatar:
                     return redirect('accounts:profile_completion')
                 else:
-                    return redirect('accounts:profile')
+                    return redirect('social:profile', username=user.username)
             else:
                 messages.error(request, 'Registration successful but login failed.')
         else:
@@ -75,7 +75,7 @@ def login_view(request):
     User login supporting email, phone, or username
     """
     if request.user.is_authenticated:
-        return redirect('accounts:profile')
+        return redirect('social:profile', username=request.user.username)
     
     if request.method == 'POST':
         form = GupShupLoginForm(request, data=request.POST)
@@ -99,7 +99,7 @@ def login_view(request):
             if next_page:
                 return redirect(next_page)
             else:
-                return redirect('accounts:profile')
+                return redirect('social:profile', username=user.username)
         else:
             messages.error(request, 'Invalid credentials. Please try again.')
     else:
@@ -123,17 +123,7 @@ def logout_view(request):
     return redirect('accounts:home')
 
 
-@login_required
-def profile_view(request):
-    """
-    User profile view
-    """
-    user = request.user
-    context = {
-        'user': user,
-        'title': f'{user.get_display_name()} - Profile'
-    }
-    return render(request, 'accounts/profile.html', context)
+# Profile view moved to social app
 
 
 @method_decorator(login_required, name='dispatch')
@@ -144,7 +134,9 @@ class ProfileCompletionView(UpdateView):
     model = GupShupUser
     form_class = ProfileCompletionForm
     template_name = 'accounts/profile_completion.html'
-    success_url = reverse_lazy('accounts:profile')
+    
+    def get_success_url(self):
+        return reverse_lazy('social:profile', kwargs={'username': self.request.user.username})
     
     def get_object(self):
         return self.request.user
@@ -159,29 +151,6 @@ class ProfileCompletionView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Complete Your Profile'
-        return context
-
-
-@method_decorator(login_required, name='dispatch')
-class ProfileEditView(UpdateView):
-    """
-    Edit user profile
-    """
-    model = GupShupUser
-    form_class = ProfileCompletionForm
-    template_name = 'accounts/profile_edit.html'
-    success_url = reverse_lazy('accounts:profile')
-    
-    def get_object(self):
-        return self.request.user
-    
-    def form_valid(self, form):
-        messages.success(self.request, 'Profile updated successfully!')
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Edit Profile'
         return context
 
 
@@ -304,3 +273,31 @@ def password_reset_request(request):
         'title': 'Reset Password'
     }
     return render(request, 'accounts/password_reset_request.html', context)
+
+
+@method_decorator(login_required, name='dispatch')
+class ProfileEditView(UpdateView):
+    """
+    Edit user profile - allows users to update their profile information
+    """
+    model = GupShupUser
+    fields = ['first_name', 'last_name', 'email', 'phone_number', 'city', 'bio', 'avatar']
+    template_name = 'accounts/profile_edit.html'
+    
+    def get_success_url(self):
+        return reverse_lazy('social:profile', kwargs={'username': self.request.user.username})
+    
+    def get_object(self):
+        return self.request.user
+    
+    def form_valid(self, form):
+        messages.success(
+            self.request, 
+            'Profile updated successfully! 🎉'
+        )
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Edit Profile'
+        return context

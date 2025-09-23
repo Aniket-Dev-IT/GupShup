@@ -1,0 +1,369 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Admin Dashboard - GupShup{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Welcome Section -->
+    <div class="col-12 mb-4">
+        <div class="card admin-card border-0 bg-gradient" 
+             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2">Welcome back, {{ admin_user.get_full_name }}! 👋</h2>
+                        <p class="mb-0 opacity-75">
+                            You're logged in as {{ admin_user.get_role_display }}. 
+                            Here's what's happening on GupShup today.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="bi bi-speedometer2" style="font-size: 4rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ stats.total_users }}</h3>
+                    <p>Total Users</p>
+                </div>
+                <i class="bi bi-people" style="font-size: 2.5rem; opacity: 0.7;"></i>
+            </div>
+            <div class="mt-3">
+                <small><i class="bi bi-arrow-up"></i> {{ stats.new_users_week }} new this week</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ stats.total_posts }}</h3>
+                    <p>Total Posts</p>
+                </div>
+                <i class="bi bi-file-post" style="font-size: 2.5rem; opacity: 0.7;"></i>
+            </div>
+            <div class="mt-3">
+                <small><i class="bi bi-arrow-up"></i> {{ stats.new_posts_week }} new this week</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ stats.active_users }}</h3>
+                    <p>Active Users</p>
+                </div>
+                <i class="bi bi-person-check" style="font-size: 2.5rem; opacity: 0.7;"></i>
+            </div>
+            <div class="mt-3">
+                <small><i class="bi bi-info-circle"></i> Currently active</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ stats.active_warnings }}</h3>
+                    <p>Active Warnings</p>
+                </div>
+                <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem; opacity: 0.7;"></i>
+            </div>
+            <div class="mt-3">
+                <small><i class="bi bi-shield-exclamation"></i> Need attention</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row g-4">
+    <!-- Recent Users -->
+    <div class="col-lg-6">
+        <div class="card admin-card h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus text-primary"></i> Recent Users
+                </h5>
+                <a href="{% url 'admin_panel:users' %}" class="btn btn-sm btn-outline-primary">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_users %}
+                    <div class="list-group list-group-flush">
+                        {% for user in recent_users %}
+                        <div class="list-group-item border-0 px-0 py-2">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-3">
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="{{ user.username }}" 
+                                             class="rounded-circle" width="40" height="40">
+                                    {% else %}
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white" 
+                                             style="width: 40px; height: 40px; font-size: 16px;">
+                                            {{ user.first_name.0|default:user.username.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                                    <small class="text-muted">
+                                        @{{ user.username }} • Joined {{ user.date_joined|timesince }} ago
+                                    </small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-{{ user.is_active|yesno:'success,secondary' }}">
+                                        {{ user.is_active|yesno:'Active,Inactive' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-person-plus" style="font-size: 2rem;"></i>
+                        <p class="mt-2">No recent users</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Posts -->
+    <div class="col-lg-6">
+        <div class="card admin-card h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-file-post text-warning"></i> Recent Posts
+                </h5>
+                <a href="{% url 'admin_panel:posts' %}" class="btn btn-sm btn-outline-warning">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_posts %}
+                    <div class="list-group list-group-flush">
+                        {% for post in recent_posts %}
+                        <div class="list-group-item border-0 px-0 py-2">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>@{{ post.author.username }}</strong>
+                                        <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1 text-muted small">
+                                        {{ post.content|truncatewords:15 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">
+                                            <i class="bi bi-heart"></i> {{ post.likes_count }}
+                                            <i class="bi bi-chat ms-2"></i> {{ post.comments_count }}
+                                        </div>
+                                        <div>
+                                            {% if post.media_files.exists %}
+                                                {% with media=post.media_files.first %}
+                                                    <span class="badge bg-info">
+                                                        {{ media.media_type|capfirst }}
+                                                    </span>
+                                                {% endwith %}
+                                            {% endif %}
+                                            <span class="badge bg-secondary">{{ post.privacy|capfirst }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-file-post" style="font-size: 2rem;"></i>
+                        <p class="mt-2">No recent posts</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Actions Row -->
+<div class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card admin-card">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity text-success"></i> Recent Admin Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_actions %}
+                    <div class="table-responsive">
+                        <table class="table admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Admin</th>
+                                    <th>Action</th>
+                                    <th>Target</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for action in recent_actions %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ action.admin.username|default:"System" }}</strong>
+                                        <br><small class="text-muted">{{ action.admin.get_role_display|default:"Automated" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if 'deleted' in action.action_type %}danger{% elif 'banned' in action.action_type %}warning{% elif 'login' in action.action_type %}success{% else %}info{% endif %}">
+                                            {{ action.get_action_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if action.target_user %}
+                                            <small>@{{ action.target_user.username }}</small>
+                                        {% elif action.target_post %}
+                                            <small>Post #{{ action.target_post.id|slice:":8" }}...</small>
+                                        {% else %}
+                                            <small class="text-muted">System</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ action.created_at|timesince }} ago</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-activity" style="font-size: 2rem;"></i>
+                        <p class="mt-2">No recent actions</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+        <div class="card admin-card">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning text-primary"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if admin_user.can_manage_users %}
+                    <a href="{% url 'admin_panel:users' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    {% endif %}
+                    
+                    {% if admin_user.can_manage_posts %}
+                    <a href="{% url 'admin_panel:posts' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-file-post"></i> Moderate Posts
+                    </a>
+                    {% endif %}
+                    
+                    {% if admin_user.can_send_warnings %}
+                    <a href="#" class="btn btn-outline-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Issue Warning
+                    </a>
+                    {% endif %}
+                    
+                    {% if admin_user.can_view_analytics %}
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="bi bi-bar-chart"></i> View Analytics
+                    </a>
+                    {% endif %}
+                    
+                    <hr class="my-2">
+                    
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                    
+                    <a href="{% url 'admin_panel:logout' %}" class="btn btn-outline-dark">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="card admin-card mt-4">
+            <div class="card-header bg-white border-0">
+                <h6 class="mb-0">
+                    <i class="bi bi-cpu text-success"></i> System Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Database</span>
+                    <span class="badge bg-success">Online</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Cache</span>
+                    <span class="badge bg-success">Active</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Storage</span>
+                    <span class="badge bg-warning">75% Used</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Uptime</span>
+                    <span class="badge bg-info">99.9%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add real-time update functionality
+    setInterval(function() {
+        // Update timestamps
+        const timeElements = document.querySelectorAll('[data-timestamp]');
+        timeElements.forEach(function(element) {
+            // Update relative time display
+            const timestamp = element.getAttribute('data-timestamp');
+            // Implementation for real-time updates would go here
+        });
+    }, 60000); // Update every minute
+    
+    // Add hover effects to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(function(card) {
+        card.addEventListener('mouseenter', function() {
+            card.style.transform = 'translateY(-5px)';
+            card.style.transition = 'all 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

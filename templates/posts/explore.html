@@ -48,7 +48,7 @@
                             <div class="card h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
-                                        <img src="{% if post.author.avatar %}{{ post.author.avatar.url }}{% else %}/static/img/default-avatar.png{% endif %}" 
+                                        <img src="{{ post.author.get_avatar_url }}" 
                                              class="rounded-circle me-2" 
                                              width="30" height="30">
                                         <div>

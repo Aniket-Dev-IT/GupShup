@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .messaging-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .conversation-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .conversation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .conversation-card.unread {
+        border-left: 4px solid var(--indian-saffron);
+        background: linear-gradient(135deg, #fff3e0, #ffffff);
+    }
+    
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--indian-saffron);
+        position: relative;
+    }
+    
+    .online-indicator {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 16px;
+        height: 16px;
+        background: #28a745;
+        border: 2px solid white;
+        border-radius: 50%;
+    }
+    
+    .unread-badge {
+        background: var(--indian-saffron);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .last-message {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .message-time {
+        color: #adb5bd;
+        font-size: 0.8rem;
+    }
+    
+    .search-box {
+        border-radius: 25px;
+        border: 2px solid #e0e0e0;
+        padding: 12px 20px;
+        transition: all 0.3s;
+    }
+    
+    .search-box:focus {
+        border-color: var(--indian-saffron);
+        box-shadow: 0 0 0 0.2rem rgba(255, 153, 51, 0.25);
+    }
+    
+    .new-message-btn {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 50px;
+        padding: 12px 25px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .new-message-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 153, 51, 0.4);
+        color: white;
+    }
+    
+    .blocked-indicator {
+        color: #dc3545;
+        font-size: 0.8rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .stats-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-search-gradient {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-search-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="messaging-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-chat-dots-fill me-2"></i>Messages
+                </h1>
+                <p class="lead mb-0">Stay connected with your GupShup community</p>
+                {% if total_unread > 0 %}
+                    <div class="mt-3">
+                        <div class="stats-card d-inline-block px-3 py-2">
+                            <i class="bi bi-envelope-fill text-warning"></i>
+                            <strong>{{ total_unread }}</strong> unread message{{ total_unread|pluralize }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Search and Actions -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="GET" class="d-flex">
+                {{ search_form.query }}
+                <button type="submit" class="btn-search-gradient ms-2">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'messaging:start_conversation' %}" class="new-message-btn btn">
+                <i class="bi bi-plus-circle"></i> New Message
+            </a>
+        </div>
+    </div>
+
+    <!-- Conversations List -->
+    {% if conversation_data %}
+        <div class="row">
+            <div class="col-12">
+                {% for conv_data in conversation_data %}
+                    <div class="card conversation-card {% if conv_data.unread_count > 0 %}unread{% endif %}" 
+                         onclick="location.href='{% url 'messaging:conversation_detail' conv_data.conversation.id %}'">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 col-md-1">
+                                    <!-- User Avatar -->
+                                    {% if conv_data.other_user.avatar %}
+                                        <img src="{{ conv_data.other_user.avatar.url }}" 
+                                             alt="{{ conv_data.other_user.get_display_name }}" class="user-avatar">
+                                    {% else %}
+                                        <div class="user-avatar bg-gradient-primary d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person-fill fs-5 text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <!-- Online indicator would go here in real implementation -->
+                                </div>
+                                
+                                <div class="col-7 col-md-8">
+                                    <!-- User Info -->
+                                    <h6 class="mb-1">
+                                        {{ conv_data.other_user.get_display_name }}
+                                        {% if conv_data.is_blocked %}
+                                            <span class="blocked-indicator">
+                                                <i class="bi bi-slash-circle"></i> Blocked
+                                            </span>
+                                        {% endif %}
+                                    </h6>
+                                    <p class="text-muted small mb-1">@{{ conv_data.other_user.username }}</p>
+                                    
+                                    <!-- Last Message -->
+                                    {% if conv_data.last_message %}
+                                        <div class="last-message">
+                                            {% if conv_data.last_message.sender == user %}
+                                                <strong>You:</strong>
+                                            {% endif %}
+                                            
+                                            {% if conv_data.last_message.message_type == 'image' %}
+                                                <i class="bi bi-image"></i> Photo
+                                            {% elif conv_data.last_message.message_type == 'file' %}
+                                                <i class="bi bi-file-earmark"></i> File
+                                            {% else %}
+                                                {{ conv_data.last_message.content|truncatewords:8 }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="message-time">
+                                            {{ conv_data.last_message.sent_at|timesince }} ago
+                                        </div>
+                                    {% else %}
+                                        <div class="last-message">
+                                            <em>No messages yet</em>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-3 text-end">
+                                    <!-- Unread Count -->
+                                    {% if conv_data.unread_count > 0 %}
+                                        <div class="unread-badge">
+                                            {{ conv_data.unread_count }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Conversation Actions -->
+                                    <div class="dropdown mt-2">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                type="button" data-bs-toggle="dropdown" 
+                                                onclick="event.stopPropagation();">
+                                            <i class="bi bi-three-dots"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" 
+                                                   href="{% url 'social:profile' conv_data.other_user.username %}">
+                                                    <i class="bi bi-person"></i> View Profile
+                                                </a>
+                                            </li>
+                                            {% if not conv_data.is_blocked %}
+                                                <li>
+                                                    <button class="dropdown-item text-danger" 
+                                                            onclick="blockUser('{{ conv_data.conversation.id }}')">
+                                                        <i class="bi bi-slash-circle"></i> Block User
+                                                    </button>
+                                                </li>
+                                            {% endif %}
+                                            <li>
+                                                <button class="dropdown-item text-danger" 
+                                                        onclick="deleteConversation('{{ conv_data.conversation.id }}')">
+                                                    <i class="bi bi-trash"></i> Delete Conversation
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="card conversation-card">
+                <div class="card-body">
+                    <i class="bi bi-chat-dots fs-1 text-primary mb-3"></i>
+                    <h4>No Conversations Yet</h4>
+                    <p class="text-muted mb-4">
+                        Start connecting with people on GupShup! Send your first message to begin building relationships.
+                    </p>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{% url 'messaging:start_conversation' %}" class="btn-primary-gradient">
+                            <i class="bi bi-plus-circle me-2"></i>Start First Conversation
+                        </a>
+                        <a href="{% url 'social:user_search' %}" class="btn-search-gradient">
+                            <i class="bi bi-search me-2"></i>Find People
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Quick Stats -->
+    {% if conversation_data %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <h5 class="text-primary">{{ conversation_data|length }}</h5>
+                                <small class="text-muted">Active Conversations</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="text-warning">{{ total_unread }}</h5>
+                                <small class="text-muted">Unread Messages</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="text-success">
+                                    {{ conversation_data|length|add:total_unread }}
+                                </h5>
+                                <small class="text-muted">Total Activity</small>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'messaging:stats' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-graph-up"></i> View Stats
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Block user function
+function blockUser(conversationId) {
+    if (confirm('Are you sure you want to block this user? They will not be able to message you.')) {
+        fetch(`/messages/api/conversation/${conversationId}/action/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'block' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+
+// Delete conversation function
+function deleteConversation(conversationId) {
+    if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+        fetch(`/messages/api/conversation/${conversationId}/action/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'delete' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

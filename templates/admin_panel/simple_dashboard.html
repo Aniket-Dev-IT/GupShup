@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}GupShup Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-edit-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        border-radius: 25px;
+        padding: 0.4rem 0.8rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        min-width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .admin-edit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .admin-manage-btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        color: white;
+        border-radius: 25px;
+        padding: 0.4rem 0.8rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        min-width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .admin-manage-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Standardized Admin Navigation Buttons */
+    .admin-nav-btn {
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        color: white;
+    }
+    
+    .admin-nav-btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: white;
+    }
+    
+    .admin-nav-user-mgmt {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .admin-nav-user-mgmt:hover {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .admin-nav-django-user {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    }
+    
+    .admin-nav-django-user:hover {
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+    }
+    
+    .admin-nav-django-post {
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    }
+    
+    .admin-nav-django-post:hover {
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+    
+    .admin-nav-full-admin {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    }
+    
+    .admin-nav-full-admin:hover {
+        box-shadow: 0 6px 20px rgba(55, 65, 81, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Admin Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; border: none; border-radius: 15px; box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);">
+                <div class="card-body text-center py-5">
+                    <h1 class="mb-3" style="color: white !important; font-weight: bold;"><i class="bi bi-speedometer2 me-3"></i>GupShup Admin Panel</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; border-radius: 15px; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);">
+                <div class="card-body text-center">
+                    <h2 class="mb-2">{{ stats.users.total }}</h2>
+                    <p class="mb-0 opacity-90">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: none; border-radius: 15px; box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);">
+                <div class="card-body text-center">
+                    <h2 class="mb-2">{{ stats.users.active }}</h2>
+                    <p class="mb-0 opacity-90">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); border: none; border-radius: 15px; box-shadow: 0 4px 20px rgba(8, 145, 178, 0.3);">
+                <div class="card-body text-center">
+                    <h2 class="mb-2">{{ stats.posts.total }}</h2>
+                    <p class="mb-0 opacity-90">Total Posts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Links -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-tools me-2"></i>Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin-panel/users/" class="admin-nav-btn admin-nav-user-mgmt">
+                                <i class="bi bi-people me-2"></i>User Management
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/accounts/gupshupuser/" class="admin-nav-btn admin-nav-django-user">
+                                <i class="bi bi-database me-2"></i>Django User Admin
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/posts/post/" class="admin-nav-btn admin-nav-django-post">
+                                <i class="bi bi-file-post me-2"></i>Django Post Admin
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/" class="admin-nav-btn admin-nav-full-admin">
+                                <i class="bi bi-gear me-2"></i>Full Django Admin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-people me-2"></i>Recent Users</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_users %}
+                        <div class="list-group list-group-flush">
+                            {% for user in recent_users %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ user.get_display_name }}</strong>
+                                    <br><small class="text-muted">@{{ user.username }} • {{ user.email }}</small>
+                                </div>
+                                <div>
+                                    <a href="/admin/accounts/gupshupuser/{{ user.id }}/change/" 
+                                       class="admin-edit-btn"
+                                       title="Edit User">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No users found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-file-post me-2"></i>Recent Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_posts %}
+                        <div class="list-group list-group-flush">
+                            {% for post in recent_posts %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>@{{ post.author.username }}</strong>
+                                        <p class="mb-1">{{ post.content|truncatewords:10 }}</p>
+                                        <small class="text-muted">{{ post.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <div>
+                                        <a href="/admin/posts/post/{{ post.id }}/change/" 
+                                           class="admin-manage-btn"
+                                           title="Manage Post">
+                                            <i class="bi bi-gear"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No posts found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

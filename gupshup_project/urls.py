@@ -23,7 +23,13 @@ urlpatterns = [
     
     # App URLs
     path('posts/', include('posts.urls')),
-    # path('social/', include('social.urls')),
+    path('social/', include('social.urls')),
+    path('messages/', include('messaging.urls')),
+    path('notifications/', include('notifications.urls')),
+    path('', include('pages.urls')),
+    
+    # GupShup Admin Panel URLs (modern UI)
+    path('admin-panel/', include('admin_panel.urls')),
 ]
 
 # Serve media files in development

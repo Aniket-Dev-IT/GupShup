@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}GupShup - Connect with India 🇮🇳{% endblock %}</title>
+    <title>{% block title %}GupShup - Connect, Share, Discover{% endblock %}</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
-    <!-- Custom CSS for Indian theme -->
+    <!-- Custom CSS for Indian theme - Updated for navbar fix -->
     <style>
         :root {
-            --indian-saffron: #FF9933;
-            --indian-white: #FFFFFF;
-            --indian-green: #138808;
-            --indian-blue: #000080;
-            --warm-orange: #FF6B35;
-            --deep-orange: #F2510E;
-            --light-orange: #FFF3E0;
-            --primary-gradient: linear-gradient(135deg, var(--indian-saffron) 0%, var(--warm-orange) 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #ff6b6b;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --dark-text: #2c3e50;
+            --light-text: #6c757d;
+            --primary-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         }
         
         body {
@@ -50,7 +50,7 @@
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
         .card {
@@ -68,8 +68,8 @@
         }
         
         .form-control:focus {
-            border-color: var(--indian-saffron);
-            box-shadow: 0 0 0 0.2rem rgba(255, 153, 51, 0.25);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
         
         .indian-flag {
@@ -107,6 +107,142 @@
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
         
+        /* Enhanced navbar styling */
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Fix navbar vertical alignment */
+        .navbar-nav .nav-link {
+            line-height: 1.5;
+            vertical-align: baseline;
+        }
+        
+        .navbar-nav .nav-link i {
+            vertical-align: baseline;
+        }
+        
+        .navbar-nav .nav-item.me-2 {
+            margin-right: 0.5rem !important;
+        }
+        
+        /* Fix for Join GupShup button */
+        .navbar-nav .nav-item:last-child .nav-link {
+            padding: 0;
+        }
+        
+        .navbar-nav .nav-item:last-child .btn {
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Dropdown menu enhancements */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .dropdown-item i {
+            width: 16px;
+            margin-right: 8px;
+        }
+        
+        /* Ensure regular nav-links don't inherit dropdown properties */
+        .navbar-nav .nav-item:not(.dropdown) .nav-link {
+            position: static !important;
+            display: inline-block !important;
+            vertical-align: baseline !important;
+            line-height: 1.5 !important;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        /* Reset any dropdown toggle properties for regular links */
+        .navbar-nav .nav-link:not(.dropdown-toggle) {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Fix dropdown alignment issues */
+        .navbar-nav .dropdown-toggle {
+            display: inline-block !important;
+            vertical-align: baseline !important;
+            line-height: 1.5 !important;
+            padding: 0.5rem 1rem !important;
+            text-decoration: none !important;
+        }
+        
+        .navbar-nav .dropdown-toggle::after {
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+        
+        /* Ensure all navbar items have consistent alignment */
+        .navbar-nav .nav-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-nav .nav-item .nav-link {
+            display: flex;
+            align-items: center;
+            height: auto;
+        }
+        
+        .navbar-nav .nav-item.dropdown .nav-link {
+            line-height: 1.5;
+            vertical-align: baseline;
+        }
+        
+        /* Fix for Bootstrap dropdown alignment */
+        .navbar-nav .dropdown {
+            position: static;
+        }
+        
+        @media (min-width: 992px) {
+            .navbar-nav .dropdown {
+                position: relative;
+            }
+        }
+        
+        /* Specific fixes for authenticated navbar */
+        .navbar-nav .nav-item:not(:last-child) {
+            margin-right: 0;
+        }
+        
+        .navbar-nav .nav-link i {
+            margin-right: 0.25rem;
+            vertical-align: baseline;
+        }
+        
+        /* Ensure dropdown toggles don't float */
+        .navbar-nav .dropdown-toggle {
+            float: none !important;
+            position: relative !important;
+        }
+        
+        /* Override Bootstrap default dropdown positioning */
+        .navbar-expand-lg .navbar-nav .dropdown-menu {
+            position: absolute;
+        }
+        
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -126,6 +262,91 @@
             font-size: 1.2rem;
             color: var(--indian-saffron);
         }
+        
+        /* GLOBAL SPACING FIX - Apply to all pages */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 200px);
+            padding: 0 !important;
+        }
+        
+        /* Full width containers globally */
+        .container-fluid {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        /* Content wrapper for responsive layout */
+        .content-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Responsive content optimization */
+        .responsive-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Prevent content from being too stretched */
+        .container {
+            max-width: 1200px !important;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper,
+            .responsive-container {
+                padding: 0 15px;
+            }
+            
+            .main-content {
+                margin-top: 70px;
+            }
+            
+            /* Mobile navbar adjustments */
+            .navbar-nav .nav-link {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .navbar-nav .nav-item.me-2 {
+                margin-right: 0 !important;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .content-wrapper,
+            .responsive-container {
+                padding: 0 10px;
+            }
+            
+            /* Small mobile navbar */
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+            
+            .btn-primary.btn-sm {
+                font-size: 0.875rem;
+                padding: 0.375rem 0.75rem;
+            }
+        }
+        
+        /* Fix for pages that need full width */
+        .full-width {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Smooth scrolling for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -135,7 +356,7 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'accounts:home' %}">
-                🇮🇳 GupShup
+                <i class="bi bi-chat-heart-fill me-2"></i>GupShup
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -143,18 +364,160 @@
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
+                {% if user.is_authenticated %}
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'posts:feed' %}">
+                                <i class="bi bi-house"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'social:user_search' %}">
+                                <i class="bi bi-search"></i> Find People
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'posts:create' %}">
+                                <i class="bi bi-plus-circle"></i> Create Post
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'messaging:conversations' %}">
+                                <i class="bi bi-chat-dots"></i> Messages
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-people"></i> Social
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'social:followers' user.username %}">
+                                    <i class="bi bi-people"></i> My Followers
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'social:following' user.username %}">
+                                    <i class="bi bi-people-fill"></i> Following
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'social:suggested_users' %}">
+                                    <i class="bi bi-person-plus"></i> Suggested People
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% else %}
+                    <!-- Navigation for non-authenticated users -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:home' %}">
+                                <i class="bi bi-house me-1"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:features' %}">
+                                <i class="bi bi-star me-1"></i>Features
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:community' %}">
+                                <i class="bi bi-people me-1"></i>Community
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pages:contact' %}">
+                                <i class="bi bi-envelope me-1"></i>Contact Us
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
+                        <!-- Notifications Dropdown -->
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                      id="notificationBadge" style="display: none;">
+                                    0
+                                </span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                                <div class="dropdown-header d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-bell-fill text-primary"></i> Notifications</span>
+                                    <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllAsRead()" 
+                                            id="markAllReadBtn" style="display: none;">
+                                        Mark all read
+                                    </button>
+                                </div>
+                                <div id="notificationsList">
+                                    <div class="text-center py-4 text-muted" id="noNotifications">
+                                        <i class="bi bi-bell-slash fs-3 mb-2"></i>
+                                        <p class="mb-0">No new notifications</p>
+                                    </div>
+                                    <div class="text-center py-3" id="loadingNotifications" style="display: none;">
+                                        <i class="bi bi-hourglass-split"></i> Loading...
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="text-center">
+                                    <a class="dropdown-item text-center" href="{% url 'notifications:list' %}">
+                                        <i class="bi bi-list"></i> View All Notifications
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <!-- Profile Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i> {{ user.get_display_name }}
+                                {% if user.is_superuser %}<span class="badge bg-danger ms-1">ADMIN</span>{% endif %}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                    <i class="bi bi-person"></i> Profile
+                                {% if user.is_superuser %}
+                                <li><h6 class="dropdown-header text-danger">
+                                    <i class="bi bi-shield-check"></i> Administrator Account
+                                </h6></li>
+                                
+                                <li><h6 class="dropdown-header text-primary">
+                                    <i class="bi bi-gear"></i> Traditional Django Admin
+                                </h6></li>
+                                <li><a class="dropdown-item" href="/admin/">
+                                    <i class="bi bi-database"></i> Django Admin Panel
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin/accounts/gupshupuser/">
+                                    <i class="bi bi-people"></i> Django User Management
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin/posts/post/">
+                                    <i class="bi bi-file-post"></i> Django Post Management
+                                </a></li>
+                                
+                                <li><h6 class="dropdown-header text-success">
+                                    <i class="bi bi-stars"></i> GupShup Admin Panel
+                                </h6></li>
+                                <li><a class="dropdown-item" href="/admin-panel/">
+                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin-panel/users/">
+                                    <i class="bi bi-person-gear"></i> User Management
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin-panel/analytics/">
+                                    <i class="bi bi-graph-up"></i> Analytics & Reports
+                                </a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                
+                                <li><a class="dropdown-item" href="{% url 'social:profile' user.username %}">
+                                    <i class="bi bi-person"></i> My Profile
                                 </a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">
-                                    <i class="bi bi-gear"></i> Settings
+                                    <i class="bi bi-gear"></i> Edit Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'social:user_search' %}">
+                                    <i class="bi bi-search"></i> Find People
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'social:suggested_users' %}">
+                                    <i class="bi bi-people"></i> Suggested
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
@@ -163,12 +526,16 @@
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                        <li class="nav-item me-2">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:register' %}">
-                                <span class="btn btn-primary btn-sm">Join GupShup</span>
+                            <a class="nav-link p-0" href="{% url 'accounts:register' %}">
+                                <span class="btn btn-primary btn-sm px-3 py-2">
+                                    <i class="bi bi-person-plus"></i> Join GupShup
+                                </span>
                             </a>
                         </li>
                     {% endif %}
@@ -178,10 +545,10 @@
     </nav>
 
     <!-- Main Content -->
-    <main style="margin-top: 80px; min-height: calc(100vh - 200px);">
-        <div class="container">
-            <!-- Messages -->
-            {% if messages %}
+    <main class="main-content">
+        <!-- Messages -->
+        {% if messages %}
+            <div class="container">
                 <div class="row mt-3">
                     <div class="col-12">
                         {% for message in messages %}
@@ -201,32 +568,77 @@
                         {% endfor %}
                     </div>
                 </div>
-            {% endif %}
-            
-            {% block content %}
-            {% endblock %}
-        </div>
+            </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="footer text-center">
+    <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
-                    <h5>🇮🇳 GupShup</h5>
-                    <p>Made in India with ❤️</p>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5><i class="bi bi-chat-heart-fill me-2"></i>GupShup</h5>
+                    <p class="mb-3">Connect with people worldwide, share your moments, and discover amazing communities.</p>
+                    <div class="d-flex gap-3">
+                        <a href="https://facebook.com" target="_blank" class="text-white" title="Follow us on Facebook"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="text-white" title="Follow us on Twitter"><i class="bi bi-twitter fs-5"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="text-white" title="Follow us on Instagram"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="https://linkedin.com/company" target="_blank" class="text-white" title="Follow us on LinkedIn"><i class="bi bi-linkedin fs-5"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h6>Connect</h6>
-                    <p>Bringing India together, one conversation at a time</p>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6>Platform</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% if user.is_authenticated %}{% url 'posts:feed' %}{% else %}{% url 'accounts:home' %}{% endif %}" class="text-light text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="text-light text-decoration-none">Sign Up</a></li>
+                        <li><a href="{% url 'accounts:login' %}" class="text-light text-decoration-none">Login</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'social:user_search' %}" class="text-light text-decoration-none">Find People</a></li>
+                        {% endif %}
+                    </ul>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6>Features</h6>
+                    <ul class="list-unstyled">
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'messaging:conversations' %}" class="text-light text-decoration-none">Messages</a></li>
+                        <li><a href="{% url 'notifications:list' %}" class="text-light text-decoration-none">Notifications</a></li>
+                        <li><a href="{% url 'social:profile' user.username %}" class="text-light text-decoration-none">My Profile</a></li>
+                        {% else %}
+                        <li><a href="{% url 'pages:features' %}" class="text-light text-decoration-none">View All Features</a></li>
+                        <li><a href="{% url 'pages:community' %}" class="text-light text-decoration-none">Join Community</a></li>
+                        <li><a href="{% url 'accounts:register' %}" class="text-light text-decoration-none">Sign Up Free</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
                     <h6>Support</h6>
-                    <p>🙏 Namaste! We're here to help</p>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'pages:help_center' %}" class="text-light text-decoration-none">Help Center</a></li>
+                        <li><a href="{% url 'pages:contact' %}" class="text-light text-decoration-none">Contact Us</a></li>
+                        <li><a href="{% url 'pages:help_center' %}" class="text-light text-decoration-none">Report Issue</a></li>
+                        <li><a href="{% url 'pages:community_guidelines' %}" class="text-light text-decoration-none">Community Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6>Legal</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'pages:privacy_policy' %}" class="text-light text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="{% url 'pages:terms_of_service' %}" class="text-light text-decoration-none">Terms of Service</a></li>
+                        <li><a href="{% url 'pages:cookie_policy' %}" class="text-light text-decoration-none">Cookie Policy</a></li>
+                        <li><a href="{% url 'pages:data_protection' %}" class="text-light text-decoration-none">Data Protection</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="indian-flag"></div>
-            <p class="mb-0">© 2025 GupShup. Built with Django & Bootstrap in India 🇮🇳</p>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+            <div class="row align-items-center">
+                <div class="col-12 text-center">
+                    <p class="mb-0">© 2025 GupShup. All rights reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -249,14 +661,205 @@
             }, 5000);
         });
         
-        // Add some Indian greetings
-        const greetings = ['नमस्ते!', 'Namaste!', 'Vanakkam!', 'Sat Sri Akal!', 'Adaab!'];
+        // Welcome message
         function showGreeting() {
-            const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-            console.log('🙏 ' + greeting + ' Welcome to GupShup!');
+            console.log('Welcome to GupShup! Connect, Share, Discover.');
         }
         
         showGreeting();
+        
+        // Notification System
+        let notificationCheckInterval;
+        
+        // Initialize notifications if user is authenticated
+        {% if user.is_authenticated %}
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotifications();
+            
+            // Check for new notifications every 30 seconds
+            notificationCheckInterval = setInterval(loadNotifications, 30000);
+            
+            // Load notifications when dropdown is opened
+            document.getElementById('notificationDropdown').addEventListener('click', function() {
+                setTimeout(loadNotifications, 100);
+            });
+        });
+        
+        // Load notifications from server
+        function loadNotifications() {
+            const loadingElement = document.getElementById('loadingNotifications');
+            const listElement = document.getElementById('notificationsList');
+            const noNotificationsElement = document.getElementById('noNotifications');
+            const badgeElement = document.getElementById('notificationBadge');
+            const markAllBtn = document.getElementById('markAllReadBtn');
+            
+            // Show loading if visible
+            if (loadingElement && loadingElement.style.display !== 'none') {
+                loadingElement.style.display = 'block';
+            }
+            
+            fetch('/notifications/ajax/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (loadingElement) loadingElement.style.display = 'none';
+                
+                if (data.success) {
+                    const notifications = data.notifications || [];
+                    const unreadCount = data.unread_count || 0;
+                    
+                    // Update badge
+                    if (badgeElement) {
+                        if (unreadCount > 0) {
+                            badgeElement.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                            badgeElement.style.display = 'block';
+                            if (markAllBtn) markAllBtn.style.display = 'block';
+                        } else {
+                            badgeElement.style.display = 'none';
+                            if (markAllBtn) markAllBtn.style.display = 'none';
+                        }
+                    }
+                    
+                    // Update notifications list
+                    if (listElement) {
+                        if (notifications.length === 0) {
+                            noNotificationsElement.style.display = 'block';
+                            listElement.innerHTML = noNotificationsElement.outerHTML;
+                        } else {
+                            noNotificationsElement.style.display = 'none';
+                            
+                            const notificationsHTML = notifications.map(notification => `
+                                <div class="dropdown-item notification-item ${
+                                    notification.is_read ? '' : 'bg-light'
+                                }" data-id="${notification.id}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="notification-icon mb-1">
+                                                ${getNotificationIcon(notification.type)}
+                                            </div>
+                                            <p class="mb-1 small">${notification.message}</p>
+                                            <small class="text-muted">${notification.created_at}</small>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-link p-0" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                ${!notification.is_read ? 
+                                                    `<li><a class="dropdown-item" href="#" onclick="markAsRead(${notification.id})">Mark as read</a></li>` : 
+                                                    ''
+                                                }
+                                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteNotification(${notification.id})">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('');
+                            
+                            listElement.innerHTML = notificationsHTML;
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading notifications:', error);
+                if (loadingElement) loadingElement.style.display = 'none';
+            });
+        }
+        
+        // Get notification icon based on type
+        function getNotificationIcon(type) {
+            const icons = {
+                'like': '<i class="bi bi-heart-fill text-danger"></i>',
+                'comment': '<i class="bi bi-chat-fill text-primary"></i>',
+                'follow': '<i class="bi bi-person-plus-fill text-success"></i>',
+                'message': '<i class="bi bi-chat-dots-fill text-info"></i>',
+                'mention': '<i class="bi bi-at text-warning"></i>',
+                'system': '<i class="bi bi-info-circle-fill text-secondary"></i>'
+            };
+            return icons[type] || icons['system'];
+        }
+        
+        // Mark notification as read
+        function markAsRead(notificationId) {
+            fetch('/notifications/api/mark-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'notification_ids': [notificationId]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadNotifications(); // Refresh the list
+                }
+            })
+            .catch(error => console.error('Error marking notification as read:', error));
+        }
+        
+        // Mark all notifications as read
+        function markAllAsRead() {
+            fetch('/notifications/api/mark-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'mark_all': true
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadNotifications(); // Refresh the list
+                }
+            })
+            .catch(error => console.error('Error marking all notifications as read:', error));
+        }
+        
+        // Delete notification
+        function deleteNotification(notificationId) {
+            if (confirm('Are you sure you want to delete this notification?')) {
+                fetch('/notifications/api/delete/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'notification_ids': [notificationId]
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotifications(); // Refresh the list
+                    }
+                })
+                .catch(error => console.error('Error deleting notification:', error));
+            }
+        }
+        
+        // Get CSRF token
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                   document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                   '';
+        }
+        {% endif %}
     </script>
     
     {% block extra_js %}{% endblock %}

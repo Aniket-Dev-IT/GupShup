@@ -20,6 +20,8 @@ urlpatterns = [
     
     # Post interactions (AJAX)
     path('api/like/', views.like_post_view, name='like_post'),
+    path('api/like-comment/', views.like_comment_view, name='like_comment'),
+    path('api/delete-comment/', views.delete_comment_view, name='delete_comment'),
     
     # Hashtag and search features
     path('hashtag/<str:hashtag>/', views.hashtag_posts_view, name='hashtag_posts'),

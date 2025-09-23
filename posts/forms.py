@@ -47,14 +47,14 @@ class PostCreationForm(forms.ModelForm):
         help_text=_('Who can see this post?')
     )
     
-    # Single image upload field (can be extended to multiple later)
-    image = forms.ImageField(
+    # Media upload field for images and videos
+    media_file = forms.FileField(
         required=False,
         widget=forms.FileInput(attrs={
             'class': 'form-control',
-            'accept': 'image/*'
+            'accept': 'image/*,video/*'
         }),
-        help_text=_('Upload an image (JPG, PNG, GIF)')
+        help_text=_('Upload an image or video (JPG, PNG, GIF, MP4, MOV)')
     )
     
     class Meta:
@@ -82,8 +82,8 @@ class PostCreationForm(forms.ModelForm):
         content = self.cleaned_data.get('content', '').strip()
         
         # Check if post is completely empty
-        if not content and not self.files.get('image'):
-            raise ValidationError(_('Post cannot be empty. Add some text or an image.'))
+        if not content and not self.files.get('media_file'):
+            raise ValidationError(_('Post cannot be empty. Add some text or media.'))
         
         # Check for spam (excessive hashtags)
         hashtags = re.findall(r'#\w+', content)
@@ -97,20 +97,28 @@ class PostCreationForm(forms.ModelForm):
         
         return content
     
-    def clean_image(self):
-        """Validate uploaded image"""
-        image = self.cleaned_data.get('image')
+    def clean_media_file(self):
+        """Validate uploaded media file"""
+        media_file = self.cleaned_data.get('media_file')
         
-        if image:
-            # Check file size (max 10MB)
-            if image.size > 10 * 1024 * 1024:
-                raise ValidationError(f'Image {image.name} is too large. Maximum size is 10MB.')
+        if media_file:
+            # Check file size (max 50MB for videos, 10MB for images)
+            max_size = 50 * 1024 * 1024 if media_file.content_type.startswith('video/') else 10 * 1024 * 1024
+            if media_file.size > max_size:
+                size_label = '50MB' if media_file.content_type.startswith('video/') else '10MB'
+                raise ValidationError(f'{media_file.name} is too large. Maximum size is {size_label}.')
             
             # Check file type
-            if not image.content_type.startswith('image/'):
-                raise ValidationError(f'{image.name} is not a valid image file.')
+            if not (media_file.content_type.startswith('image/') or media_file.content_type.startswith('video/')):
+                raise ValidationError(f'{media_file.name} is not a valid image or video file.')
+            
+            # Additional video validation
+            if media_file.content_type.startswith('video/'):
+                allowed_video_types = ['video/mp4', 'video/quicktime', 'video/x-msvideo']
+                if media_file.content_type not in allowed_video_types:
+                    raise ValidationError('Only MP4, MOV, and AVI video formats are supported.')
         
-        return image
+        return media_file
     
     def save(self, commit=True):
         """Save post with author"""
@@ -121,13 +129,15 @@ class PostCreationForm(forms.ModelForm):
         if commit:
             post.save()
             
-            # Handle image upload
-            image = self.cleaned_data.get('image')
-            if image:
+            # Handle media file upload
+            media_file = self.cleaned_data.get('media_file')
+            if media_file:
+                # Determine media type
+                media_type = 'video' if media_file.content_type.startswith('video/') else 'image'
                 PostMedia.objects.create(
                     post=post,
-                    file=image,
-                    media_type='image',
+                    file=media_file,
+                    media_type=media_type,
                     order=0
                 )
         
@@ -193,7 +203,7 @@ class CommentForm(forms.ModelForm):
 
 class PostEditForm(forms.ModelForm):
     """
-    Form for editing existing posts
+    Enhanced form for editing existing posts with media support
     """
     
     content = forms.CharField(
@@ -202,8 +212,10 @@ class PostEditForm(forms.ModelForm):
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 4,
-            'style': 'resize: vertical;'
-        })
+            'style': 'resize: vertical;',
+            'placeholder': 'Update your post content...'
+        }),
+        help_text=_('Update your post content (supports Hindi and English)')
     )
     
     location = forms.CharField(
@@ -211,15 +223,37 @@ class PostEditForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Update location'
-        })
+            'placeholder': 'Update location (e.g., Mumbai, Maharashtra)',
+            'list': 'indian-cities'
+        }),
+        help_text=_('Update your location')
     )
     
     privacy = forms.ChoiceField(
         choices=Post.PRIVACY_CHOICES,
         widget=forms.Select(attrs={
             'class': 'form-control'
-        })
+        }),
+        help_text=_('Update who can see this post')
+    )
+    
+    # New media fields for editing
+    new_media_file = forms.FileField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*,video/*',
+            'multiple': False
+        }),
+        help_text=_('Upload new image or video to replace existing media (optional)')
+    )
+    
+    remove_media = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text=_('Check this to remove all existing media files')
     )
     
     class Meta:
@@ -230,18 +264,73 @@ class PostEditForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Pre-populate form with existing data
-        if self.instance:
-            self.fields['content'].widget.attrs['placeholder'] = 'Update your post...'
+        if self.instance and self.instance.pk:
+            # Add information about existing media
+            media_count = self.instance.media_files.count()
+            if media_count > 0:
+                media_type = 'image' if self.instance.media_files.first().media_type == 'image' else 'video'
+                self.fields['new_media_file'].help_text = f'Currently has {media_count} {media_type}(s). Upload new file to replace all existing media.'
     
     def clean_content(self):
         """Validate updated content"""
         content = self.cleaned_data.get('content', '').strip()
         
-        # Check if post is completely empty (must have either content or images)
-        if not content and not self.instance.media_files.exists():
-            raise ValidationError(_('Post cannot be empty. Add some text or keep existing images.'))
+        # Check if post will be completely empty after edit
+        remove_media = self.cleaned_data.get('remove_media', False)
+        new_media = self.cleaned_data.get('new_media_file')
+        has_existing_media = self.instance.media_files.exists() if self.instance else False
+        
+        # Post must have either content or media
+        if not content:
+            if remove_media and not new_media:
+                raise ValidationError(_('Post cannot be empty. Add some text or media.'))
+            elif not has_existing_media and not new_media:
+                raise ValidationError(_('Post cannot be empty. Add some text or media.'))
         
         return content
+    
+    def clean_new_media_file(self):
+        """Validate new media file"""
+        media_file = self.cleaned_data.get('new_media_file')
+        
+        if media_file:
+            # Check file size (max 50MB for videos, 10MB for images)
+            max_size = 50 * 1024 * 1024 if media_file.content_type.startswith('video/') else 10 * 1024 * 1024
+            if media_file.size > max_size:
+                size_label = '50MB' if media_file.content_type.startswith('video/') else '10MB'
+                raise ValidationError(f'File is too large. Maximum size is {size_label}.')
+            
+            # Check file type
+            if not (media_file.content_type.startswith('image/') or media_file.content_type.startswith('video/')):
+                raise ValidationError('Please upload a valid image or video file.')
+        
+        return media_file
+    
+    def save(self, commit=True):
+        """Save post with media handling"""
+        post = super().save(commit=commit)
+        
+        if commit:
+            # Handle media removal
+            if self.cleaned_data.get('remove_media', False):
+                post.media_files.all().delete()
+            
+            # Handle new media upload
+            new_media = self.cleaned_data.get('new_media_file')
+            if new_media:
+                # Remove existing media if new media is uploaded
+                post.media_files.all().delete()
+                
+                # Add new media
+                media_type = 'video' if new_media.content_type.startswith('video/') else 'image'
+                PostMedia.objects.create(
+                    post=post,
+                    file=new_media,
+                    media_type=media_type,
+                    order=0
+                )
+        
+        return post
 
 
 class HashtagSearchForm(forms.Form):

@@ -1,0 +1,321 @@
+<!-- Sidebar Navigation -->
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <div class="position-sticky pt-3">
+        <!-- Main Navigation -->
+        <ul class="nav flex-column">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                   href="{% url 'admin_panel:dashboard' %}">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Dashboard
+                    <span class="badge bg-primary ms-auto">
+                        <i class="fas fa-home"></i>
+                    </span>
+                </a>
+            </li>
+            
+            <!-- Analytics (if has permission) -->
+            {% if request.admin_user.has_permission:'view_analytics' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" 
+                   href="{% url 'admin_panel:analytics' %}">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Analytics
+                    <span class="badge bg-info ms-auto">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <!-- User Management Section -->
+        {% if request.admin_user.has_permission:'manage_users' %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>User Management</span>
+            <i class="fas fa-users"></i>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'users' %}active{% endif %}" 
+                   href="{% url 'admin_panel:users' %}">
+                    <i class="fas fa-users me-2"></i>
+                    All Users
+                    {% if total_users %}
+                    <span class="badge bg-secondary ms-auto">{{ total_users|floatformat:0 }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'banned_users' %}active{% endif %}" 
+                   href="{% url 'admin_panel:banned_users' %}">
+                    <i class="fas fa-user-slash me-2 text-danger"></i>
+                    Banned Users
+                    {% if banned_users_count %}
+                    <span class="badge bg-danger ms-auto">{{ banned_users_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'user_warnings' %}active{% endif %}" 
+                   href="{% url 'admin_panel:user_warnings' %}">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                    Warnings
+                    {% if active_warnings_count %}
+                    <span class="badge bg-warning ms-auto">{{ active_warnings_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'ban_appeals' %}active{% endif %}" 
+                   href="{% url 'admin_panel:ban_appeals' %}">
+                    <i class="fas fa-gavel me-2 text-info"></i>
+                    Ban Appeals
+                    {% if pending_appeals_count %}
+                    <span class="badge bg-info ms-auto">{{ pending_appeals_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+        
+        <!-- Content Management Section -->
+        {% if request.admin_user.has_permission:'manage_posts' or request.admin_user.has_permission:'moderate_content' %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>Content Management</span>
+            <i class="fas fa-file-alt"></i>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            {% if request.admin_user.has_permission:'manage_posts' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'posts' %}active{% endif %}" 
+                   href="{% url 'admin_panel:posts' %}">
+                    <i class="fas fa-file-alt me-2"></i>
+                    All Posts
+                    {% if total_posts %}
+                    <span class="badge bg-secondary ms-auto">{{ total_posts|floatformat:0 }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if request.admin_user.has_permission:'moderate_content' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'moderation_queue' %}active{% endif %}" 
+                   href="{% url 'admin_panel:moderation_queue' %}">
+                    <i class="fas fa-shield-alt me-2 text-warning"></i>
+                    Moderation Queue
+                    {% if pending_moderation_count %}
+                    <span class="badge bg-warning ms-auto">{{ pending_moderation_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'automated_flagging' %}active{% endif %}" 
+                   href="{% url 'admin_panel:automated_flagging' %}">
+                    <i class="fas fa-robot me-2 text-primary"></i>
+                    Auto Flagging
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'content_reports' %}active{% endif %}" 
+                   href="{% url 'admin_panel:content_reports' %}">
+                    <i class="fas fa-flag me-2 text-danger"></i>
+                    Content Reports
+                    {% if unresolved_reports_count %}
+                    <span class="badge bg-danger ms-auto">{{ unresolved_reports_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+        
+        <!-- System Administration Section -->
+        {% if request.admin_user.role in 'super_admin,admin' %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>System</span>
+            <i class="fas fa-cogs"></i>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            {% if request.admin_user.role == 'super_admin' or request.admin_user.has_permission:'manage_admins' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}" 
+                   href="{% url 'admin_panel:admin_users' %}">
+                    <i class="fas fa-user-shield me-2 text-primary"></i>
+                    Admin Users
+                    {% if active_admins_count %}
+                    <span class="badge bg-primary ms-auto">{{ active_admins_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}" 
+                   href="{% url 'admin_panel:audit_logs' %}">
+                    <i class="fas fa-history me-2 text-info"></i>
+                    Audit Logs
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'system_settings' %}active{% endif %}" 
+                   href="{% url 'admin_panel:system_settings' %}">
+                    <i class="fas fa-cog me-2 text-secondary"></i>
+                    Settings
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'platform_announcements' %}active{% endif %}" 
+                   href="{% url 'admin_panel:platform_announcements' %}">
+                    <i class="fas fa-bullhorn me-2 text-success"></i>
+                    Announcements
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+        
+        <!-- Reports Section -->
+        {% if request.admin_user.has_permission:'view_reports' %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>Reports</span>
+            <i class="fas fa-chart-pie"></i>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'user_reports' %}active{% endif %}" 
+                   href="{% url 'admin_panel:user_reports' %}">
+                    <i class="fas fa-users me-2"></i>
+                    User Reports
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'content_reports_summary' %}active{% endif %}" 
+                   href="{% url 'admin_panel:content_reports_summary' %}">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Content Reports
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'moderation_reports' %}active{% endif %}" 
+                   href="{% url 'admin_panel:moderation_reports' %}">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Moderation Reports
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'export_data' %}active{% endif %}" 
+                   href="{% url 'admin_panel:export_data' %}">
+                    <i class="fas fa-download me-2 text-success"></i>
+                    Export Data
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+        
+        <!-- Quick Actions Section -->
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>Quick Actions</span>
+            <i class="fas fa-bolt"></i>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="runContentScan(); return false;">
+                    <i class="fas fa-search me-2 text-primary"></i>
+                    Run Content Scan
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="generateDailyReport(); return false;">
+                    <i class="fas fa-file-pdf me-2 text-danger"></i>
+                    Daily Report
+                </a>
+            </li>
+            
+            {% if request.admin_user.has_permission:'manage_users' %}
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
+                    <i class="fas fa-tasks me-2 text-warning"></i>
+                    Bulk Actions
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <!-- System Status -->
+        <div class="mt-4 px-3">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-3">
+                    <h6 class="card-title text-muted mb-2">
+                        <i class="fas fa-server me-1"></i>
+                        System Status
+                    </h6>
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Server Load</small>
+                        <small class="text-success">Normal</small>
+                    </div>
+                    <div class="progress mb-2" style="height: 4px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Active Sessions</small>
+                        <small class="text-info">{{ active_admin_sessions|default:'0' }}</small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <small>Last Backup</small>
+                        <small class="text-muted">{{ last_backup_time|default:'N/A' }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-3 px-3 text-center">
+            <small class="text-muted">
+                <i class="fas fa-shield-alt"></i>
+                v1.0.0
+            </small>
+        </div>
+    </div>
+</nav>
+
+<!-- Quick Actions JavaScript -->
+<script>
+function runContentScan() {
+    if (confirm('Run automated content scan? This may take a few minutes.')) {
+        $('#loading-spinner').removeClass('d-none');
+        $.post('{% url "admin_panel:run_content_scan" %}', {
+            'days_back': 7,
+            'content_type': 'both'
+        }).done(function(response) {
+            toastr.success('Content scan completed successfully!');
+            location.reload();
+        }).fail(function() {
+            toastr.error('Error running content scan');
+        }).always(function() {
+            $('#loading-spinner').addClass('d-none');
+        });
+    }
+}
+
+function generateDailyReport() {
+    $('#loading-spinner').removeClass('d-none');
+    window.open('{% url "admin_panel:generate_report" %}?type=daily&format=pdf', '_blank');
+    $('#loading-spinner').addClass('d-none');
+    toastr.info('Daily report is being generated...');
+}
+</script>

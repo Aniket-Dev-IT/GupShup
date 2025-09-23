@@ -1,0 +1,58 @@
+name: GupShup Django Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🔍 Run Django system checks
+      run: |
+        python manage.py check
+
+    - name: 🧪 Run tests
+      run: |
+        python manage.py test
+
+    - name: 📊 Generate coverage report
+      run: |
+        pip install coverage
+        coverage run --source='.' manage.py test
+        coverage report --show-missing
+
+    - name: 🏗️ Test Django migrations
+      run: |
+        python manage.py makemigrations --check --dry-run
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔐 Run security checks
+      uses: securecodewarrior/github-action-add-sarif@v1
+      with:
+        sarif-file: 'security-results.sarif'

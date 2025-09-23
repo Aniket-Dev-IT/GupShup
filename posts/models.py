@@ -8,7 +8,7 @@ import uuid
 
 def post_media_path(instance, filename):
     """Generate upload path for post media"""
-    return f'posts/{instance.author.username}/{uuid.uuid4().hex[:8]}_{filename}'
+    return f'posts/{instance.post.author.username}/{uuid.uuid4().hex[:8]}_{filename}'
 
 
 class Post(models.Model):

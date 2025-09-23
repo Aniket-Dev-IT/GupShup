@@ -11,14 +11,138 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
+from django.utils import timezone
 import json
 import re
+import datetime
 from collections import Counter
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 from .models import Post, PostMedia
 from .forms import PostCreationForm, CommentForm, PostEditForm, HashtagSearchForm, PostSearchForm
-from social.models import Like, Comment, Follow
+from social.models import Like, Comment, CommentLike, Follow
 from accounts.models import GupShupUser
+
+
+def apply_content_mixing(posts_list):
+    """
+    Mix videos and images naturally to prevent clustering of similar content types.
+    Maintains chronological relevance while ensuring better content distribution.
+    """
+    if not posts_list:
+        return posts_list
+    
+    # Separate posts by content type
+    video_posts = []
+    image_posts = []
+    text_only_posts = []
+    
+    for post in posts_list:
+        media_types = list(post.media_files.values_list('media_type', flat=True))
+        if 'video' in media_types:
+            video_posts.append(post)
+        elif 'image' in media_types:
+            image_posts.append(post)
+        else:
+            text_only_posts.append(post)
+    
+    # Simple mixing algorithm: alternate between content types
+    mixed_posts = []
+    video_idx = image_idx = text_idx = 0
+    
+    # Calculate mixing ratio based on content distribution
+    total_media = len(video_posts) + len(image_posts)
+    if total_media == 0:
+        return posts_list  # No media posts, return as-is
+    
+    video_ratio = len(video_posts) / total_media if total_media > 0 else 0
+    
+    # Advanced mixing algorithm to prevent clustering
+    # Calculate optimal distribution pattern
+    total_posts = len(posts_list)
+    video_frequency = len(video_posts) / total_posts if total_posts > 0 else 0
+    image_frequency = len(image_posts) / total_posts if total_posts > 0 else 0
+    
+    position = 0
+    last_added_type = None
+    consecutive_count = 0
+    
+    while (video_idx < len(video_posts) or image_idx < len(image_posts) or 
+           text_idx < len(text_only_posts)):
+        
+        # Determine next content type to prevent clustering
+        next_type = None
+        
+        # Rule 1: Never allow more than 2 consecutive same types (except text)
+        if consecutive_count >= 2 and last_added_type in ['video', 'image']:
+            # Force different type
+            if last_added_type == 'video' and image_idx < len(image_posts):
+                next_type = 'image'
+            elif last_added_type == 'image' and video_idx < len(video_posts):
+                next_type = 'video'
+            elif text_idx < len(text_only_posts):
+                next_type = 'text'
+        
+        # Rule 2: Text posts every 4-5 positions
+        if next_type is None and position % 4 == 0 and text_idx < len(text_only_posts):
+            next_type = 'text'
+        
+        # Rule 3: Distribute based on content ratio and availability
+        if next_type is None:
+            # Choose based on frequency and what's available
+            if (video_idx < len(video_posts) and image_idx < len(image_posts)):
+                # Both available - choose based on position and frequency
+                if (position * video_frequency) > video_idx:
+                    next_type = 'video'
+                else:
+                    next_type = 'image'
+            elif video_idx < len(video_posts):
+                next_type = 'video'
+            elif image_idx < len(image_posts):
+                next_type = 'image'
+            elif text_idx < len(text_only_posts):
+                next_type = 'text'
+        
+        # Add the selected post type
+        if next_type == 'video' and video_idx < len(video_posts):
+            mixed_posts.append(video_posts[video_idx])
+            video_idx += 1
+        elif next_type == 'image' and image_idx < len(image_posts):
+            mixed_posts.append(image_posts[image_idx])
+            image_idx += 1
+        elif next_type == 'text' and text_idx < len(text_only_posts):
+            mixed_posts.append(text_only_posts[text_idx])
+            text_idx += 1
+        else:
+            # Fallback - add whatever is available
+            if video_idx < len(video_posts):
+                mixed_posts.append(video_posts[video_idx])
+                video_idx += 1
+                next_type = 'video'
+            elif image_idx < len(image_posts):
+                mixed_posts.append(image_posts[image_idx])
+                image_idx += 1
+                next_type = 'image'
+            elif text_idx < len(text_only_posts):
+                mixed_posts.append(text_only_posts[text_idx])
+                text_idx += 1
+                next_type = 'text'
+            else:
+                break
+        
+        # Update clustering tracking
+        if next_type == last_added_type:
+            consecutive_count += 1
+        else:
+            consecutive_count = 1
+        
+        last_added_type = next_type
+        position += 1
+    
+    return mixed_posts
 
 
 @login_required
@@ -38,7 +162,7 @@ def feed_view(request):
     feed_posts = Post.objects.select_related('author').prefetch_related(
         'media_files',
         'likes',
-        Prefetch('comments', queryset=Comment.objects.select_related('author').order_by('-created_at')[:3])
+        Prefetch('comments', queryset=Comment.objects.select_related('author').order_by('-created_at'))
     )
     
     # Filter posts based on privacy and following
@@ -59,8 +183,12 @@ def feed_view(request):
     # Order by creation date (most recent first)
     feed_posts = feed_posts.order_by('-created_at')
     
-    # Pagination
-    paginator = Paginator(feed_posts, 10)  # 10 posts per page
+    # Apply natural content mixing to prevent video/image clustering
+    feed_posts_list = list(feed_posts[:100])  # Work with reasonable batch size
+    mixed_posts = apply_content_mixing(feed_posts_list)
+    
+    # Pagination with mixed content
+    paginator = Paginator(mixed_posts, 10)  # 10 posts per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -70,7 +198,7 @@ def feed_view(request):
     # Check if user has liked each post
     for post in page_obj:
         post.user_has_liked = post.likes.filter(user=user).exists()
-        post.recent_comments = post.comments.all()[:3]
+        post.recent_comments = list(post.comments.all()[:3])
     
     # Post creation form
     if request.method == 'POST':
@@ -219,25 +347,181 @@ def like_post_view(request):
 
 
 @login_required
+@require_POST
+def like_comment_view(request):
+    """
+    AJAX view to like/unlike comments
+    """
+    try:
+        data = json.loads(request.body)
+        comment_id = data.get('comment_id')
+        
+        comment = get_object_or_404(Comment, pk=comment_id)
+        
+        # Check if user already liked the comment
+        like, created = CommentLike.objects.get_or_create(
+            user=request.user,
+            comment=comment
+        )
+        
+        if not created:
+            # User already liked, so unlike
+            like.delete()
+            liked = False
+        else:
+            liked = True
+        
+        # Get updated like count
+        like_count = comment.likes.count()
+        
+        return JsonResponse({
+            'success': True,
+            'liked': liked,
+            'like_count': like_count
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
+
+@login_required
+@require_POST
+def delete_comment_view(request):
+    """
+    AJAX view to delete comments (only by author)
+    """
+    try:
+        data = json.loads(request.body)
+        comment_id = data.get('comment_id')
+        
+        if not comment_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Comment ID is required'
+            })
+        
+        # Get the comment and ensure it exists
+        comment = get_object_or_404(Comment, pk=comment_id)
+        
+        # Check if user is the author of the comment
+        if comment.author != request.user:
+            logger.warning(f"Unauthorized comment deletion attempt by user {request.user.username} for comment {comment_id}")
+            return JsonResponse({
+                'success': False,
+                'error': 'You can only delete your own comments'
+            })
+        
+        # Store post info for response
+        post_id = str(comment.post.id)
+        was_reply = bool(comment.parent_comment)
+        parent_comment_id = str(comment.parent_comment.id) if comment.parent_comment else None
+        
+        # Delete the comment (this will also delete replies due to CASCADE)
+        comment_content_preview = comment.content[:50] + '...' if len(comment.content) > 50 else comment.content
+        comment.delete()
+        
+        # Log the deletion
+        logger.info(f"Comment {comment_id} deleted by user {request.user.username}")
+        
+        # Get updated counts
+        from posts.models import Post
+        post = Post.objects.get(pk=post_id)
+        updated_comment_count = post.comments.count()
+        
+        # If this was a reply, get updated reply count for parent
+        updated_reply_count = None
+        if parent_comment_id:
+            try:
+                parent_comment = Comment.objects.get(pk=parent_comment_id)
+                updated_reply_count = parent_comment.replies.count()
+            except Comment.DoesNotExist:
+                pass
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Comment deleted successfully! 🗑️',
+            'post_id': post_id,
+            'comment_id': comment_id,
+            'was_reply': was_reply,
+            'parent_comment_id': parent_comment_id,
+            'updated_comment_count': updated_comment_count,
+            'updated_reply_count': updated_reply_count
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        })
+    except Comment.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Comment not found'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting comment {comment_id}: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while deleting the comment'
+        })
+
+
+@login_required
 def edit_post_view(request, pk):
     """
-    Edit existing post (only by author)
+    Enhanced edit existing post with media support (only by author)
     """
     post = get_object_or_404(Post, pk=pk, author=request.user)
     
     if request.method == 'POST':
-        form = PostEditForm(request.POST, instance=post)
+        form = PostEditForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Post updated successfully! ✏️')
-            return redirect('posts:detail', pk=pk)
+            try:
+                # Update timestamp before saving
+                post.updated_at = timezone.now()
+                
+                # Save the updated post with media handling
+                # The form's save method handles media operations automatically
+                updated_post = form.save()
+                
+                # Log the edit action
+                logger.info(f"Post {pk} edited by user {request.user.username}")
+                
+                # Show success message with details
+                media_action = ''
+                if form.cleaned_data.get('remove_media'):
+                    media_action = ' (media removed)'
+                elif form.cleaned_data.get('new_media_file'):
+                    media_action = ' (media updated)'
+                
+                messages.success(request, f'Post updated successfully{media_action}! ✏️')
+                return redirect('posts:detail', pk=pk)
+                
+            except Exception as save_error:
+                logger.error(f"Error saving edited post {pk}: {str(save_error)}")
+                messages.error(request, 'An error occurred while saving your changes. Please try again.')
+        else:
+            # Form has errors - display them
+            for field, errors in form.errors.items():
+                field_name = form.fields[field].label or field.replace('_', ' ').title()
+                for error in errors:
+                    messages.error(request, f'{field_name}: {error}')
     else:
         form = PostEditForm(instance=post)
+    
+    # Get existing media for display
+    existing_media = post.media_files.all().order_by('order')
     
     context = {
         'form': form,
         'post': post,
-        'title': 'Edit Post'
+        'existing_media': existing_media,
+        'media_count': existing_media.count(),
+        'title': 'Edit Post',
+        'can_edit_media': True  # Flag to show media editing options
     }
     
     return render(request, 'posts/edit_post.html', context)

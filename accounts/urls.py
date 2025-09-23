@@ -17,7 +17,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     
     # Profile URLs
-    path('profile/', views.profile_view, name='profile'),
     path('profile/complete/', views.ProfileCompletionView.as_view(), name='profile_completion'),
     path('profile/edit/', views.ProfileEditView.as_view(), name='profile_edit'),
     

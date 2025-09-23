@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%), 
+                    url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+        color: white;
+        padding: 120px 0 80px;
+        position: relative;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 1;
+    }
+    
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .community-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+        border: none;
+        margin-bottom: 2rem;
+    }
+    
+    .community-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .community-icon {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        color: #667eea;
+    }
+    
+    .stats-row {
+        margin-top: -60px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 2px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        border: none;
+        margin-bottom: 2rem;
+    }
+    
+    .user-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .user-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .testimonial-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border-left: 4px solid #667eea;
+        margin-bottom: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 200px;
+    }
+    
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .values-icon {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+        display: block;
+        text-align: center;
+    }
+    
+    .values-icon i {
+        display: inline-block;
+        font-size: inherit;
+        line-height: 1;
+    }
+    
+    /* Enhanced button styling */
+    .btn-primary-gradient {
+        min-width: 180px;
+        padding: 15px 25px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    /* Ensure equal testimonial heights */
+    .testimonial-card {
+        justify-content: space-between;
+    }
+    
+    .testimonial-card p {
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">
+                    Join India's Most Vibrant Social Community
+                </h1>
+                <p class="lead mb-4">
+                    Connect with millions of Indians worldwide, share your culture, celebrate traditions, 
+                    and build lasting friendships in a welcoming environment.
+                </p>
+                <a href="{% url 'accounts:register' %}" class="btn-primary-gradient">
+                    <i class="bi bi-arrow-right me-2"></i>Join Our Community
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Community Stats -->
+<section class="stats-row py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <span class="stat-number">{{ user_count }}+</span>
+                    <h6 class="fw-bold text-muted">Community Members</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <span class="stat-number">{{ recent_posts_count }}+</span>
+                    <h6 class="fw-bold text-muted">Stories Shared</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <span class="stat-number">500+</span>
+                    <h6 class="fw-bold text-muted">Cities Connected</h6>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <span class="stat-number">15+</span>
+                    <h6 class="fw-bold text-muted">Languages Supported</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What Makes Our Community Special -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">What Makes Our Community Special</h2>
+                <p class="lead text-muted">
+                    Discover why thousands of Indians choose GupShup as their digital home
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-globe-asia-australia"></i></div>
+                    <h4 class="fw-bold mb-3">Cultural Diversity</h4>
+                    <p class="text-muted">
+                        Celebrate the rich diversity of India with people from all states and territories. 
+                        Share traditions and learn from others.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-people"></i></div>
+                    <h4 class="fw-bold mb-3">Global Indian Network</h4>
+                    <p class="text-muted">
+                        Connect with Indians worldwide - from major cities to small towns. 
+                        Share experiences and stay connected.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-calendar-event"></i></div>
+                    <h4 class="fw-bold mb-3">Festival Celebrations</h4>
+                    <p class="text-muted">
+                        Experience festival celebrations together. From Diwali to regional festivals, 
+                        celebrate as one community.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-briefcase"></i></div>
+                    <h4 class="fw-bold mb-3">Professional Network</h4>
+                    <p class="text-muted">
+                        Build professional networks across industries. 
+                        Share opportunities and grow your career.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-house"></i></div>
+                    <h4 class="fw-bold mb-3">Home Away From Home</h4>
+                    <p class="text-muted">
+                        Find your community wherever you are. Connect with locals 
+                        and never feel alone in a new place.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="community-card">
+                    <div class="community-icon"><i class="bi bi-lightbulb"></i></div>
+                    <h4 class="fw-bold mb-3">Learn & Share Knowledge</h4>
+                    <p class="text-muted">
+                        Share knowledge and learn from others. From career advice 
+                        to cultural practices, grow together.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Community Members -->
+{% if recent_users %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">Meet Our Community Members</h2>
+                <p class="lead text-muted">
+                    Join these wonderful people who are part of our growing community
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for user in recent_users %}
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="user-card">
+                    <div class="user-avatar d-flex align-items-center justify-content-center bg-primary text-white">
+                        {{ user.get_display_name|slice:":1"|upper }}
+                    </div>
+                    <h6 class="fw-bold mb-1">{{ user.get_display_name }}</h6>
+                    {% if user.city %}
+                        <small class="text-muted">{{ user.city }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'accounts:register' %}" class="btn-primary-gradient">
+                <i class="bi bi-person-plus me-2"></i>Join These Amazing People
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Community Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">What Our Community Says</h2>
+                <p class="lead text-muted">
+                    Real stories from people who found their digital home on GupShup
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-6 d-flex flex-column">
+                <div class="testimonial-card flex-fill mb-4">
+                    <p class="mb-auto fst-italic flex-grow-1">
+                        "GupShup helped me reconnect with my college friends after years! Now we have a group where 
+                        we share memories and plan reunions. It's wonderful to stay connected."
+                    </p>
+                    <div class="d-flex align-items-center mt-auto">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px;">
+                            PS
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Priya S.</h6>
+                            <small class="text-muted">Software Engineer, Mumbai</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card flex-fill">
+                    <p class="mb-auto fst-italic flex-grow-1">
+                        "Being an Indian student abroad, I felt homesick. GupShup connected me with other 
+                        Indians in my city. We celebrate festivals together and support each other."
+                    </p>
+                    <div class="d-flex align-items-center mt-auto">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px;">
+                            RK
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Rahul K.</h6>
+                            <small class="text-muted">Graduate Student, Berlin</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 d-flex flex-column">
+                <div class="testimonial-card flex-fill mb-4">
+                    <p class="mb-auto fst-italic flex-grow-1">
+                        "As a business owner, I found amazing partners and customers through GupShup. 
+                        The community here is very supportive and collaborative."
+                    </p>
+                    <div class="d-flex align-items-center mt-auto">
+                        <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px;">
+                            AP
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Anita P.</h6>
+                            <small class="text-muted">Entrepreneur, Ahmedabad</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card flex-fill">
+                    <p class="mb-auto fst-italic flex-grow-1">
+                        "I love how GupShup celebrates diversity. I've learned about many regional 
+                        festivals and traditions. It's like having friends from every corner of India."
+                    </p>
+                    <div class="d-flex align-items-center mt-auto">
+                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 50px; height: 50px;">
+                            AM
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Arjun M.</h6>
+                            <small class="text-muted">Marketing Manager, Kochi</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Community Values -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-4">Our Community Values</h2>
+                <p class="lead text-muted mb-5">
+                    We believe in creating a safe, respectful, and inclusive environment for everyone
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="values-icon"><i class="bi bi-heart-fill"></i></div>
+                        <h5 class="fw-bold">Respect</h5>
+                        <p class="text-muted">Treat everyone with kindness and respect</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="values-icon"><i class="bi bi-people-fill"></i></div>
+                        <h5 class="fw-bold">Inclusivity</h5>
+                        <p class="text-muted">Welcome all backgrounds and perspectives</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="values-icon"><i class="bi bi-shield-check"></i></div>
+                        <h5 class="fw-bold">Safety</h5>
+                        <p class="text-muted">Maintain a safe space for everyone</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="values-icon"><i class="bi bi-arrow-up-circle"></i></div>
+                        <h5 class="fw-bold">Growth</h5>
+                        <p class="text-muted">Support each other's learning and development</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'pages:community_guidelines' %}" class="btn-primary-gradient">
+                        <i class="bi bi-book me-2"></i>Community Guidelines
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Join Community CTA -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-4">Ready to Join Our Community?</h2>
+                <p class="lead mb-4">
+                    Join {{ user_count }}+ Indians who have found their digital home on GupShup. 
+                    Your community is waiting for you!
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn-primary-gradient">
+                        <i class="bi bi-heart me-2"></i>Join Our Community
+                    </a>
+                    <a href="{% url 'pages:features' %}" class="btn-primary-gradient" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        <i class="bi bi-star me-2"></i>Explore Features
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+{% endblock %}

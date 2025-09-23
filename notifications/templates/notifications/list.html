@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - GupShup{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-item {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-left: 4px solid transparent;
+    }
+    
+    .notification-item:hover {
+        background-color: #f8f9fa !important;
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .notification-item.unread {
+        background-color: #e3f2fd;
+        border-left-color: #2196F3;
+    }
+    
+    .notification-item.read {
+        background-color: #ffffff;
+        border-left-color: #e0e0e0;
+        opacity: 0.8;
+    }
+    
+    .notification-icon {
+        font-size: 1.2rem;
+    }
+    
+    .notification-type-like {
+        border-left-color: #e91e63 !important;
+    }
+    
+    .notification-type-comment {
+        border-left-color: #2196F3 !important;
+    }
+    
+    .notification-type-follow {
+        border-left-color: #4CAF50 !important;
+    }
+    
+    .notification-type-message {
+        border-left-color: #00BCD4 !important;
+    }
+    
+    .notification-type-mention {
+        border-left-color: #FF9800 !important;
+    }
+    
+    .notification-type-system {
+        border-left-color: #9E9E9E !important;
+    }
+    
+    .filter-tabs {
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+    
+    .filter-tabs .nav-link {
+        border: none;
+        color: #666;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 0;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+    
+    .filter-tabs .nav-link.active {
+        background-color: transparent;
+        color: #007bff;
+        border-bottom-color: #007bff;
+        font-weight: 600;
+    }
+    
+    .notification-actions {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .notification-item:hover .notification-actions {
+        opacity: 1;
+    }
+    
+    .bulk-actions {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .checkbox-all {
+        transform: scale(1.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-bell-fill text-primary"></i> Notifications</h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="refreshNotifications()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="openSettings()">
+                    <i class="bi bi-gear"></i> Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Card -->
+        {% if notifications_count > 0 %}
+        <div class="stats-card">
+            <div class="row text-center">
+                <div class="col-4">
+                    <h3>{{ notifications_count }}</h3>
+                    <small>Total</small>
+                </div>
+                <div class="col-4">
+                    <h3>{{ unread_count }}</h3>
+                    <small>Unread</small>
+                </div>
+                <div class="col-4">
+                    <h3>{{ read_count }}</h3>
+                    <small>Read</small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filter Tabs -->
+        <ul class="nav nav-pills filter-tabs">
+            <li class="nav-item">
+                <a class="nav-link {% if not filter_type %}active{% endif %}" href="?">
+                    All <span class="badge bg-secondary ms-1">{{ notifications_count }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if filter_type == 'unread' %}active{% endif %}" href="?filter=unread">
+                    Unread <span class="badge bg-primary ms-1">{{ unread_count }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if filter_type == 'like' %}active{% endif %}" href="?filter=like">
+                    <i class="bi bi-heart-fill text-danger"></i> Likes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if filter_type == 'comment' %}active{% endif %}" href="?filter=comment">
+                    <i class="bi bi-chat-fill text-primary"></i> Comments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if filter_type == 'follow' %}active{% endif %}" href="?filter=follow">
+                    <i class="bi bi-person-plus-fill text-success"></i> Follows
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if filter_type == 'message' %}active{% endif %}" href="?filter=message">
+                    <i class="bi bi-chat-dots-fill text-info"></i> Messages
+                </a>
+            </li>
+        </ul>
+
+        <!-- Bulk Actions -->
+        {% if notifications %}
+        <div class="bulk-actions" id="bulkActions" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <input type="checkbox" class="form-check-input checkbox-all me-2" id="selectAll" onchange="toggleSelectAll()">
+                    <label for="selectAll" class="form-check-label">Select All</label>
+                    <span class="ms-3 text-muted" id="selectedCount">0 selected</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="markSelectedAsRead()">
+                        <i class="bi bi-check2-all"></i> Mark as Read
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSelected()">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Notifications List -->
+        <div id="notificationsList">
+            {% if notifications %}
+                {% for notification in notifications %}
+                <div class="notification-item {{ notification.type }} {% if not notification.is_read %}unread{% else %}read{% endif %} notification-type-{{ notification.type }}" 
+                     data-id="{{ notification.id }}">
+                    <div class="d-flex align-items-start">
+                        <input type="checkbox" class="form-check-input me-3 mt-1 notification-checkbox" 
+                               value="{{ notification.id }}" onchange="updateBulkActions()">
+                        
+                        <div class="notification-icon me-3 mt-1">
+                            {% if notification.type == 'like' %}
+                                <i class="bi bi-heart-fill text-danger"></i>
+                            {% elif notification.type == 'comment' %}
+                                <i class="bi bi-chat-fill text-primary"></i>
+                            {% elif notification.type == 'follow' %}
+                                <i class="bi bi-person-plus-fill text-success"></i>
+                            {% elif notification.type == 'message' %}
+                                <i class="bi bi-chat-dots-fill text-info"></i>
+                            {% elif notification.type == 'mention' %}
+                                <i class="bi bi-at text-warning"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex-grow-1">
+                            <p class="mb-1">{{ notification.message }}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ notification.created_at|timesince }} ago
+                            </small>
+                            {% if not notification.is_read %}
+                                <span class="badge bg-primary ms-2">New</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="notification-actions ms-2">
+                            <div class="btn-group">
+                                {% if not notification.is_read %}
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            onclick="markAsRead({{ notification.id }})"
+                                            title="Mark as read">
+                                        <i class="bi bi-check2"></i>
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="deleteNotification({{ notification.id }})"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Notifications pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if filter_type %}&filter={{ filter_type }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if filter_type %}&filter={{ filter_type }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if filter_type %}&filter={{ filter_type }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <i class="bi bi-bell-slash"></i>
+                    <h4>No notifications yet</h4>
+                    <p class="text-muted">
+                        {% if filter_type %}
+                            No {{ filter_type }} notifications found.
+                        {% else %}
+                            When you receive notifications, they'll appear here.
+                        {% endif %}
+                    </p>
+                    {% if filter_type %}
+                        <a href="{% url 'notifications:list' %}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> View All Notifications
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-gear"></i> Notification Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <h6>Email Notifications</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailLikes">
+                            <label class="form-check-label" for="emailLikes">
+                                Likes on my posts
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailComments">
+                            <label class="form-check-label" for="emailComments">
+                                Comments on my posts
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailFollows">
+                            <label class="form-check-label" for="emailFollows">
+                                New followers
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="emailMessages">
+                            <label class="form-check-label" for="emailMessages">
+                                Direct messages
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Push Notifications</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pushEnabled">
+                            <label class="form-check-label" for="pushEnabled">
+                                Enable push notifications
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Auto-cleanup</h6>
+                        <select class="form-select" id="autoCleanup">
+                            <option value="never">Never delete</option>
+                            <option value="30">Delete after 30 days</option>
+                            <option value="60">Delete after 60 days</option>
+                            <option value="90">Delete after 90 days</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                    <i class="bi bi-check2"></i> Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedNotifications = new Set();
+
+    // Refresh notifications
+    function refreshNotifications() {
+        location.reload();
+    }
+
+    // Open settings modal
+    function openSettings() {
+        const modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+        modal.show();
+        loadSettings();
+    }
+
+    // Load current settings
+    function loadSettings() {
+        fetch('/notifications/api/settings/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const settings = data.settings;
+                document.getElementById('emailLikes').checked = settings.email_likes || false;
+                document.getElementById('emailComments').checked = settings.email_comments || false;
+                document.getElementById('emailFollows').checked = settings.email_follows || false;
+                document.getElementById('emailMessages').checked = settings.email_messages || false;
+                document.getElementById('pushEnabled').checked = settings.push_enabled || false;
+                document.getElementById('autoCleanup').value = settings.auto_cleanup || 'never';
+            }
+        })
+        .catch(error => console.error('Error loading settings:', error));
+    }
+
+    // Save settings
+    function saveSettings() {
+        const settings = {
+            email_likes: document.getElementById('emailLikes').checked,
+            email_comments: document.getElementById('emailComments').checked,
+            email_follows: document.getElementById('emailFollows').checked,
+            email_messages: document.getElementById('emailMessages').checked,
+            push_enabled: document.getElementById('pushEnabled').checked,
+            auto_cleanup: document.getElementById('autoCleanup').value
+        };
+
+        fetch('/notifications/api/settings/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+                showAlert('Settings saved successfully!', 'success');
+            } else {
+                showAlert('Error saving settings.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving settings:', error);
+            showAlert('Error saving settings.', 'error');
+        });
+    }
+
+    // Toggle select all
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.notification-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+        });
+        
+        updateBulkActions();
+    }
+
+    // Update bulk actions visibility
+    function updateBulkActions() {
+        const checkboxes = document.querySelectorAll('.notification-checkbox:checked');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+        
+        selectedNotifications.clear();
+        checkboxes.forEach(checkbox => {
+            selectedNotifications.add(parseInt(checkbox.value));
+        });
+        
+        if (selectedNotifications.size > 0) {
+            bulkActions.style.display = 'block';
+            selectedCount.textContent = `${selectedNotifications.size} selected`;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+        
+        // Update select all checkbox
+        const allCheckboxes = document.querySelectorAll('.notification-checkbox');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        selectAllCheckbox.checked = selectedNotifications.size === allCheckboxes.length;
+    }
+
+    // Mark selected notifications as read
+    function markSelectedAsRead() {
+        if (selectedNotifications.size === 0) return;
+        
+        fetch('/notifications/api/mark-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                notification_ids: Array.from(selectedNotifications)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error marking notifications as read:', error));
+    }
+
+    // Delete selected notifications
+    function deleteSelected() {
+        if (selectedNotifications.size === 0) return;
+        
+        if (confirm(`Delete ${selectedNotifications.size} notification(s)?`)) {
+            fetch('/notifications/api/delete/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    notification_ids: Array.from(selectedNotifications)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error deleting notifications:', error));
+        }
+    }
+
+    // Mark single notification as read
+    function markAsRead(notificationId) {
+        fetch('/notifications/api/mark-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                notification_ids: [notificationId]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error marking notification as read:', error));
+    }
+
+    // Delete single notification
+    function deleteNotification(notificationId) {
+        if (confirm('Delete this notification?')) {
+            fetch('/notifications/api/delete/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    notification_ids: [notificationId]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error deleting notification:', error));
+        }
+    }
+
+    // Utility functions
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    function showAlert(message, type) {
+        // Simple alert implementation
+        alert(message);
+    }
+</script>
+{% endblock %}

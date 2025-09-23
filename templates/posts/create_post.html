@@ -1,0 +1,630 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-post-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .post-form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-floating-custom {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating-custom textarea,
+    .form-floating-custom input {
+        border-radius: 15px;
+        border: 2px solid #e0e6ed;
+        padding: 1rem 1rem 1rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating-custom textarea:focus,
+    .form-floating-custom input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .privacy-selector {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1rem;
+        border: 2px solid #e0e6ed;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .privacy-option:hover {
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .privacy-option input[type="radio"] {
+        margin-right: 0.75rem;
+    }
+    
+    .privacy-icon {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+        width: 30px;
+        text-align: center;
+    }
+    
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 15px;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-upload-area {
+        border: 2px dashed #667eea;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        background: rgba(102, 126, 234, 0.05);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+    }
+    
+    .image-upload-area:hover {
+        border-color: var(--secondary-color);
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .image-upload-area.dragover {
+        border-color: var(--accent-color);
+        background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .post-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f1f3f4;
+    }
+    
+    .character-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        padding: 0.5rem 1rem;
+        background: #f8f9fa;
+        border-radius: 20px;
+    }
+    
+    .character-count.warning {
+        color: #fd7e14;
+        background: #fff3cd;
+    }
+    
+    .character-count.danger {
+        color: #dc3545;
+        background: #f8d7da;
+    }
+    
+    .post-preview {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border: 2px solid #e9ecef;
+    }
+    
+    .preview-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .preview-avatar {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+    }
+    
+    .tips-card {
+        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: none;
+    }
+    
+    .btn-create-post {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-create-post:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .btn-create-post:disabled {
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .btn-preview {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .btn-clear {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-clear:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-post-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-pencil-square me-2"></i>Share Your Story
+                </h1>
+                <p class="lead mb-0">Express yourself in Hindi or English • Connect with India 🇮🇳</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Tips Card -->
+            <div class="tips-card">
+                <h6 class="mb-3">
+                    <i class="bi bi-lightbulb text-primary"></i> 
+                    <strong>Tips for Great Posts</strong>
+                </h6>
+                <div class="row small">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Use #hashtags to reach more people</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Add your location to connect locally</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Share authentic experiences</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Support both Hindi and English</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Add images for better engagement</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-1"></i> Choose appropriate privacy settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Post Form -->
+            <form method="post" enctype="multipart/form-data" id="postForm" class="post-form-card">
+                {% csrf_token %}
+                
+                <!-- Content Textarea -->
+                <div class="form-floating-custom">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">
+                        <i class="bi bi-chat-text me-1"></i> What's on your mind?
+                    </label>
+                    {{ form.content|add_class:"form-control" }}
+                    <div class="form-text">{{ form.content.help_text }}</div>
+                    {% for error in form.content.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Character Counter -->
+                <div class="d-flex justify-content-end">
+                    <span class="character-count" id="characterCount">0/2000</span>
+                </div>
+                
+                <!-- Media Upload Area -->
+                <div class="image-upload-area" id="mediaUploadArea">
+                    <div class="upload-icon">
+                        <i class="bi bi-cloud-upload"></i>
+                    </div>
+                    <h5>Drop images or videos here or click to upload</h5>
+                    <p class="mb-0 small text-muted">Images: JPG, PNG, GIF (Max 10MB) • Videos: MP4, MOV, AVI (Max 50MB)</p>
+                    {{ form.media_file|add_class:"d-none" }}
+                </div>
+                
+                <!-- Media Preview -->
+                <div id="mediaPreview" style="display: none;">
+                    <div id="imagePreviewContainer" style="display: none;">
+                        <img id="previewImg" class="image-preview" alt="Image preview">
+                    </div>
+                    <div id="videoPreviewContainer" style="display: none;">
+                        <video id="previewVideo" class="image-preview" controls>
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="removeMedia">
+                            <i class="bi bi-trash"></i> Remove Media
+                        </button>
+                    </div>
+                </div>
+                
+                {% for error in form.media_file.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+                
+                <!-- Location -->
+                <div class="form-floating-custom">
+                    <label for="{{ form.location.id_for_label }}" class="form-label">
+                        <i class="bi bi-geo-alt me-1"></i> Location (Optional)
+                    </label>
+                    {{ form.location|add_class:"form-control" }}
+                    
+                    <!-- Indian Cities Datalist -->
+                    <datalist id="indian-cities">
+                        <option value="Mumbai, Maharashtra">
+                        <option value="Delhi, Delhi">
+                        <option value="Bangalore, Karnataka">
+                        <option value="Chennai, Tamil Nadu">
+                        <option value="Kolkata, West Bengal">
+                        <option value="Hyderabad, Telangana">
+                        <option value="Pune, Maharashtra">
+                        <option value="Ahmedabad, Gujarat">
+                        <option value="Jaipur, Rajasthan">
+                        <option value="Lucknow, Uttar Pradesh">
+                        <option value="Kanpur, Uttar Pradesh">
+                        <option value="Nagpur, Maharashtra">
+                        <option value="Indore, Madhya Pradesh">
+                        <option value="Bhopal, Madhya Pradesh">
+                        <option value="Visakhapatnam, Andhra Pradesh">
+                        <option value="Patna, Bihar">
+                        <option value="Vadodara, Gujarat">
+                        <option value="Ludhiana, Punjab">
+                    </datalist>
+                    
+                    <div class="form-text">{{ form.location.help_text }}</div>
+                    {% for error in form.location.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Privacy Settings -->
+                <div class="privacy-selector">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-shield-lock me-1"></i> Who can see this post?
+                    </label>
+                    
+                    <div class="privacy-options">
+                        {% for choice in form.privacy %}
+                            <label class="privacy-option">
+                                {{ choice.tag }}
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center">
+                                        {% if choice.choice_value == 'public' %}
+                                            <i class="bi bi-globe privacy-icon text-success"></i>
+                                            <div>
+                                                <div class="fw-bold">Public</div>
+                                                <div class="small text-muted">Anyone on GupShup can see</div>
+                                            </div>
+                                        {% elif choice.choice_value == 'friends' %}
+                                            <i class="bi bi-people privacy-icon text-primary"></i>
+                                            <div>
+                                                <div class="fw-bold">Friends</div>
+                                                <div class="small text-muted">Only people you follow</div>
+                                            </div>
+                                        {% elif choice.choice_value == 'private' %}
+                                            <i class="bi bi-lock privacy-icon text-warning"></i>
+                                            <div>
+                                                <div class="fw-bold">Only Me</div>
+                                                <div class="small text-muted">Only you can see</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    
+                    {% for error in form.privacy.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Post Preview -->
+                <div class="post-preview" id="postPreview" style="display: none;">
+                    <div class="preview-header">
+                        <img src="{{ user.get_avatar_url }}" 
+                             class="preview-avatar" alt="{{ user.get_display_name }}">
+                        <div>
+                            <div class="fw-bold">{{ user.get_display_name }}</div>
+                            <div class="small text-muted">@{{ user.username }} • Just now</div>
+                        </div>
+                    </div>
+                    <div id="previewContent"></div>
+                    <div class="small text-muted mt-2" id="previewLocation"></div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="post-actions">
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="button" class="btn-preview" id="togglePreview">
+                            <i class="bi bi-eye me-2"></i>Preview
+                        </button>
+                        <button type="button" class="btn-clear" onclick="clearForm()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Clear
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn-create-post" id="submitBtn">
+                            <i class="bi bi-send me-1"></i> Share Post
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Form Errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('postForm');
+    const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+    const characterCount = document.getElementById('characterCount');
+    const mediaInput = document.getElementById('{{ form.media_file.id_for_label }}');
+    const mediaUploadArea = document.getElementById('mediaUploadArea');
+    const mediaPreview = document.getElementById('mediaPreview');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+    const previewImg = document.getElementById('previewImg');
+    const previewVideo = document.getElementById('previewVideo');
+    const removeMediaBtn = document.getElementById('removeMedia');
+    const submitBtn = document.getElementById('submitBtn');
+    const togglePreviewBtn = document.getElementById('togglePreview');
+    const postPreview = document.getElementById('postPreview');
+    const previewContent = document.getElementById('previewContent');
+    const locationInput = document.getElementById('{{ form.location.id_for_label }}');
+    const previewLocation = document.getElementById('previewLocation');
+    
+    // Character counter
+    function updateCharacterCount() {
+        const length = contentTextarea.value.length;
+        characterCount.textContent = `${length}/2000`;
+        
+        characterCount.className = 'character-count';
+        if (length > 1800) {
+            characterCount.classList.add('warning');
+        }
+        if (length > 1950) {
+            characterCount.classList.add('danger');
+        }
+        
+        // Update submit button state
+        updateSubmitButton();
+        updatePreview();
+    }
+    
+    // Update submit button state
+    function updateSubmitButton() {
+        const hasContent = contentTextarea.value.trim().length > 0;
+        const hasMedia = mediaInput.files.length > 0;
+        const isValid = hasContent || hasMedia;
+        
+        submitBtn.disabled = !isValid;
+        
+        if (!isValid) {
+            submitBtn.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i> Add content or media';
+        } else {
+            submitBtn.innerHTML = '<i class="bi bi-send me-1"></i> Share Post';
+        }
+    }
+    
+    // Update preview
+    function updatePreview() {
+        const content = contentTextarea.value.trim();
+        const location = locationInput.value.trim();
+        
+        if (content) {
+            // Simple hashtag and mention highlighting
+            let formattedContent = content
+                .replace(/#(\w+)/g, '<span class="text-primary">#$1</span>')
+                .replace(/@(\w+)/g, '<span class="text-info">@$1</span>')
+                .replace(/\n/g, '<br>');
+            
+            previewContent.innerHTML = formattedContent;
+        } else {
+            previewContent.innerHTML = '<em class="text-muted">No content yet...</em>';
+        }
+        
+        if (location) {
+            previewLocation.innerHTML = `<i class="bi bi-geo-alt me-1"></i> ${location}`;
+            previewLocation.style.display = 'block';
+        } else {
+            previewLocation.style.display = 'none';
+        }
+    }
+    
+    // Media upload handling
+    function handleMediaUpload(file) {
+        if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mediaPreview.style.display = 'block';
+                mediaUploadArea.style.display = 'none';
+                
+                if (file.type.startsWith('image/')) {
+                    previewImg.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                    videoPreviewContainer.style.display = 'none';
+                } else if (file.type.startsWith('video/')) {
+                    previewVideo.src = e.target.result;
+                    videoPreviewContainer.style.display = 'block';
+                    imagePreviewContainer.style.display = 'none';
+                }
+                
+                updateSubmitButton();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Event listeners
+    contentTextarea.addEventListener('input', updateCharacterCount);
+    locationInput.addEventListener('input', updatePreview);
+    
+    // Media upload area click
+    mediaUploadArea.addEventListener('click', function() {
+        mediaInput.click();
+    });
+    
+    // Media input change
+    mediaInput.addEventListener('change', function() {
+        if (this.files[0]) {
+            handleMediaUpload(this.files[0]);
+        }
+    });
+    
+    // Remove media
+    removeMediaBtn.addEventListener('click', function() {
+        mediaInput.value = '';
+        mediaPreview.style.display = 'none';
+        mediaUploadArea.style.display = 'block';
+        imagePreviewContainer.style.display = 'none';
+        videoPreviewContainer.style.display = 'none';
+        updateSubmitButton();
+    });
+    
+    // Drag and drop
+    mediaUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    mediaUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    mediaUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            mediaInput.files = e.dataTransfer.files;
+            handleMediaUpload(file);
+        }
+    });
+    
+    // Preview toggle
+    togglePreviewBtn.addEventListener('click', function() {
+        if (postPreview.style.display === 'none') {
+            postPreview.style.display = 'block';
+            this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Preview';
+        } else {
+            postPreview.style.display = 'none';
+            this.innerHTML = '<i class="bi bi-eye"></i> Preview';
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i> Sharing...';
+    });
+    
+    // Initialize
+    updateCharacterCount();
+    updatePreview();
+});
+
+// Clear form function
+function clearForm() {
+    if (confirm('Are you sure you want to clear all content?')) {
+        document.getElementById('postForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imageUploadArea').style.display = 'block';
+        document.getElementById('postPreview').style.display = 'none';
+        document.getElementById('characterCount').textContent = '0/2000';
+        document.getElementById('characterCount').className = 'character-count';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('togglePreview').innerHTML = '<i class="bi bi-eye"></i> Preview';
+    }
+}
+</script>
+{% endblock %}
